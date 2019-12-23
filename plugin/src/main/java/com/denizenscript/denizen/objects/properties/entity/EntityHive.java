@@ -7,6 +7,7 @@ import com.denizenscript.denizencore.objects.Mechanism;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.properties.Property;
 import com.denizenscript.denizencore.tags.Attribute;
+import org.bukkit.block.Beehive;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.EntityType;
 
@@ -51,6 +52,15 @@ public class EntityHive implements Property {
 
     public boolean hasHive() {
         if (((Bee) bee.getBukkitEntity()).getHive() != null) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean isHive(LocationTag location) {
+        if (location.getBlockState() instanceof Beehive) {
             return true;
         }
         else {
@@ -125,7 +135,9 @@ public class EntityHive implements Property {
         // <EntityTag.hive>
         // -->
 
-        if (mechanism.matches("hive") && mechanism.requireObject(LocationTag.class)) {
+        if (mechanism.matches("hive")
+                && mechanism.requireObject(LocationTag.class)
+                && isHive(mechanism.valueAsType(LocationTag.class))) {
             ((Bee) bee.getBukkitEntity()).setHive(mechanism.valueAsType(LocationTag.class));
         }
     }
