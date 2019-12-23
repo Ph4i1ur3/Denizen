@@ -57,7 +57,6 @@ public class MaterialPickle implements Property {
         // @group properties
         // @description
         // Returns the maximum amount of pickles allowed in a Sea Pickle material.
-        // (GoMinecraft's only setting)
         // -->
         PropertyParser.<MaterialPickle>registerTag("pickle_max", (attribute, material) -> {
             return new ElementTag(material.getMax());
