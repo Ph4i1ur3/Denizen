@@ -109,7 +109,6 @@ public class EntityHive implements Property {
         // <--[tag]
         // @attribute <EntityTag.has_hive>
         // @returns ElementTag(boolean)
-        // @mechanism EntityTag.has_hive
         // @group properties
         // @description
         // Returns whether or not this Bee has a hive.
