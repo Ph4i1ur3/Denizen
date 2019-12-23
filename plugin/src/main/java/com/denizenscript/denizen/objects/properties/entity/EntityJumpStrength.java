@@ -27,7 +27,7 @@ public class EntityJumpStrength implements Property {
     }
 
     public static final String[] handledTags = new String[] {
-            "jump_strength"
+            "jump_strength", "jump_in_blocks"
     };
 
     public static final String[] handledMechs = new String[] {
@@ -81,6 +81,20 @@ public class EntityJumpStrength implements Property {
         // -->
         if (attribute.startsWith("jump_strength")) {
             return new ElementTag(((Horse) entity.getBukkitEntity()).getJumpStrength())
+                    .getObjectAttribute(attribute.fulfill(1));
+        }
+
+        // <--[tag]
+        // @attribute <EntityTag.jump_strength>
+        // @returns ElementTag(Number)
+        // @mechanism EntityTag.jump_strength
+        // @group properties
+        // @description
+        // Returns the power of a horse's jump in blocks.
+        // -->
+        if (attribute.startsWith("jump_in_blocks")) {
+            double x = ((Horse) entity.getBukkitEntity()).getJumpStrength();
+            return new ElementTag(-0.1817584952 * Math.pow(x, 3.0) + 3.689713992 * Math.pow(x, 2) + 2.128599134 * x - 0.343930367)
                     .getObjectAttribute(attribute.fulfill(1));
         }
 
