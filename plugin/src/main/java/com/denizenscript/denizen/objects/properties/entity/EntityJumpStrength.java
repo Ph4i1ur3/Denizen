@@ -85,9 +85,9 @@ public class EntityJumpStrength implements Property {
         }
 
         // <--[tag]
-        // @attribute <EntityTag.jump_strength>
+        // @attribute <EntityTag.jump_in_blocks>
         // @returns ElementTag(Number)
-        // @mechanism EntityTag.jump_strength
+        // @mechanism EntityTag.jump_in_blocks
         // @group properties
         // @description
         // Returns the power of a horse's jump in blocks.
