@@ -93,7 +93,7 @@ public class EntityJumpStrength implements Property {
         // -->
         if (attribute.startsWith("jump_in_blocks")) {
             double x = ((Horse) entity.getBukkitEntity()).getJumpStrength();
-            return new ElementTag(-0.1817584952 * Math.pow(x, 3.0) + 3.689713992 * Math.pow(x, 2) + 2.128599134 * x - 0.343930367)
+            return new ElementTag(-0.1817584952 * Math.pow(x, 3) + 3.689713992 * Math.pow(x, 2) + 2.128599134 * x - 0.343930367)
                     .getObjectAttribute(attribute.fulfill(1));
         }
 
