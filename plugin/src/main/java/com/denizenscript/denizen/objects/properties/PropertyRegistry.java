@@ -157,6 +157,9 @@ public class PropertyRegistry {
             PropertyParser.registerProperty(MaterialLightable.class, MaterialTag.class);
             PropertyParser.registerProperty(MaterialPersistent.class, MaterialTag.class);
             PropertyParser.registerProperty(MaterialPickle.class, MaterialTag.class);
+            if (NMSHandler.getVersion().isAtLeast(NMSVersion.v1_14)) {
+                PropertyParser.registerProperty(MaterialCampfire.class, MaterialTag.class);
+            }
             PropertyParser.registerProperty(MaterialSlab.class, MaterialTag.class);
             PropertyParser.registerProperty(MaterialSnowable.class, MaterialTag.class);
             PropertyParser.registerProperty(MaterialSwitchable.class, MaterialTag.class);
