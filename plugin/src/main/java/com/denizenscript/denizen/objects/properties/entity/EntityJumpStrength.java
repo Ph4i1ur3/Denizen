@@ -10,7 +10,6 @@ import org.bukkit.entity.Donkey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Mule;
-import org.bukkit.entity.Donkey;
 
 public class EntityJumpStrength implements Property {
 
@@ -117,19 +116,6 @@ public class EntityJumpStrength implements Property {
         // -->
         if (attribute.startsWith("jump_strength")) {
             return new ElementTag(getJumpStrength())
-                    .getObjectAttribute(attribute.fulfill(1));
-        }
-
-        // <--[tag]
-        // @attribute <EntityTag.jump_in_blocks>
-        // @returns ElementTag(Number)
-        // @group properties
-        // @description
-        // Returns the power of a horse's jump in blocks.
-        // -->
-        if (attribute.startsWith("jump_in_blocks")) {
-            double x = getJumpStrength();
-            return new ElementTag(-0.1817584952 * Math.pow(x, 3) + 3.689713992 * Math.pow(x, 2) + 2.128599134 * x - 0.343930367)
                     .getObjectAttribute(attribute.fulfill(1));
         }
 
