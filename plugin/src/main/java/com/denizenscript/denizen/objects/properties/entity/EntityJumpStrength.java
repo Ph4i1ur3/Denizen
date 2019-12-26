@@ -38,7 +38,6 @@ public class EntityJumpStrength implements Property {
             "jump_strength"
     };
 
-
     ///////////////////
     // Instance Fields and Methods
     /////////////
@@ -52,6 +51,7 @@ public class EntityJumpStrength implements Property {
     /////////
     // Property Methods
     ///////
+
     public boolean isMule() {
         return entity.getBukkitEntityType() == EntityType.MULE;
     }
@@ -94,7 +94,6 @@ public class EntityJumpStrength implements Property {
         return "jump_strength";
     }
 
-
     ///////////
     // ObjectTag Attributes
     ////////
@@ -118,7 +117,6 @@ public class EntityJumpStrength implements Property {
             return new ElementTag(getJumpStrength())
                     .getObjectAttribute(attribute.fulfill(1));
         }
-
         return null;
     }
 

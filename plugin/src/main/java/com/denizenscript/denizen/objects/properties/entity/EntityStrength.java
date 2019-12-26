@@ -32,8 +32,7 @@ public class EntityStrength implements Property {
     public static final String[] handledMechs = new String[] {
             "strength"
     };
-
-
+    
     ///////////////////
     // Instance Fields and Methods
     /////////////
