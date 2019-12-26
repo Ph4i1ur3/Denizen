@@ -6,15 +6,19 @@ import com.denizenscript.denizencore.objects.Mechanism;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.properties.Property;
 import com.denizenscript.denizencore.tags.Attribute;
+import org.bukkit.entity.Donkey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
+import org.bukkit.entity.Mule;
 
 public class EntityJumpStrength implements Property {
 
 
     public static boolean describes(ObjectTag entity) {
         return entity instanceof EntityTag &&
-                ((EntityTag) entity).getBukkitEntityType() == EntityType.HORSE;
+                ((EntityTag) entity).getBukkitEntityType() == EntityType.HORSE ||
+                ((EntityTag) entity).getBukkitEntityType() == EntityType.DONKEY ||
+                ((EntityTag) entity).getBukkitEntityType() == EntityType.MULE;
     }
 
     public static EntityJumpStrength getFrom(ObjectTag entity) {
@@ -48,10 +52,44 @@ public class EntityJumpStrength implements Property {
     /////////
     // Property Methods
     ///////
+    public boolean isMule() {
+        return entity instanceof Mule;
+    }
+
+    public boolean isDonkey() {
+        return entity instanceof Donkey;
+    }
+
+    public double getJumpStrength() {
+        if (isMule()) {
+            return ((Mule) entity.getBukkitEntity()).getJumpStrength();
+        }
+        else if (isDonkey()) {
+            return ((Donkey) entity.getBukkitEntity()).getJumpStrength();
+        }
+        else {
+            return ((Horse) entity.getBukkitEntity()).getJumpStrength();
+        }
+    }
+
+    public void setJumpStrength(double i) {
+        if (isMule()) {
+            ((Mule) entity.getBukkitEntity()).setJumpStrength(i);
+            return;
+        }
+        else if (isDonkey()) {
+            ((Donkey) entity.getBukkitEntity()).setJumpStrength(i);
+            return;
+        }
+        else {
+            ((Horse) entity.getBukkitEntity()).setJumpStrength(i);
+            return;
+        }
+    }
 
     @Override
     public String getPropertyString() {
-        return String.valueOf(((Horse) entity.getBukkitEntity()).getJumpStrength());
+        return String.valueOf(getJumpStrength());
     }
 
     @Override
@@ -80,7 +118,7 @@ public class EntityJumpStrength implements Property {
         // Returns the power of a horse's jump.
         // -->
         if (attribute.startsWith("jump_strength")) {
-            return new ElementTag(((Horse) entity.getBukkitEntity()).getJumpStrength())
+            return new ElementTag(getJumpStrength())
                     .getObjectAttribute(attribute.fulfill(1));
         }
 
@@ -93,8 +131,8 @@ public class EntityJumpStrength implements Property {
         // Returns the power of a horse's jump in blocks.
         // -->
         if (attribute.startsWith("jump_in_blocks")) {
-            double x = ((Horse) entity.getBukkitEntity()).getJumpStrength();
-            return new ElementTag(-0.1817584952 * Math.pow(x, 3.0) + 3.689713992 * Math.pow(x, 2) + 2.128599134 * x - 0.343930367)
+            double x = getJumpStrength();
+            return new ElementTag(-0.1817584952 * Math.pow(x, 3) + 3.689713992 * Math.pow(x, 2) + 2.128599134 * x - 0.343930367)
                     .getObjectAttribute(attribute.fulfill(1));
         }
 
@@ -115,7 +153,7 @@ public class EntityJumpStrength implements Property {
         // -->
 
         if (mechanism.matches("jump_strength") && mechanism.requireDouble()) {
-            ((Horse) entity.getBukkitEntity()).setJumpStrength(mechanism.getValue().asDouble());
+            setJumpStrength(mechanism.getValue().asDouble());
         }
     }
 }
