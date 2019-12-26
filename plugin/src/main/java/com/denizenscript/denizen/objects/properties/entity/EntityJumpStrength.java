@@ -10,6 +10,7 @@ import org.bukkit.entity.Donkey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Mule;
+import org.bukkit.entity.Donkey;
 
 public class EntityJumpStrength implements Property {
 
@@ -53,11 +54,11 @@ public class EntityJumpStrength implements Property {
     // Property Methods
     ///////
     public boolean isMule() {
-        return entity instanceof Mule;
+        return entity.getBukkitEntityType() == EntityType.MULE;
     }
 
     public boolean isDonkey() {
-        return entity instanceof Donkey;
+        return entity.getBukkitEntityType() == EntityType.DONKEY;
     }
 
     public double getJumpStrength() {
@@ -75,15 +76,12 @@ public class EntityJumpStrength implements Property {
     public void setJumpStrength(double i) {
         if (isMule()) {
             ((Mule) entity.getBukkitEntity()).setJumpStrength(i);
-            return;
         }
         else if (isDonkey()) {
             ((Donkey) entity.getBukkitEntity()).setJumpStrength(i);
-            return;
         }
         else {
             ((Horse) entity.getBukkitEntity()).setJumpStrength(i);
-            return;
         }
     }
 
@@ -150,7 +148,6 @@ public class EntityJumpStrength implements Property {
         // @tags
         // <EntityTag.jump_strength>
         // -->
-
         if (mechanism.matches("jump_strength") && mechanism.requireDouble()) {
             setJumpStrength(mechanism.getValue().asDouble());
         }
