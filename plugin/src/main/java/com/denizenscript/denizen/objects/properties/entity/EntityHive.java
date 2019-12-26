@@ -11,7 +11,6 @@ import org.bukkit.block.Beehive;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.EntityType;
 
-
 public class EntityHive implements Property {
 
     public static boolean describes(ObjectTag entity) {
