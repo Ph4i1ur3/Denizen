@@ -26,11 +26,11 @@ public class EntityStrength implements Property {
     }
 
     public static final String[] handledTags = new String[] {
-            "arms"
+            "strength"
     };
 
     public static final String[] handledMechs = new String[] {
-            "arms"
+            "strength"
     };
 
 
@@ -75,7 +75,7 @@ public class EntityStrength implements Property {
         // @mechanism EntityTag.strength
         // @group properties
         // @description
-        // If the entity is an armor stand, returns whether the armor stand has arms.
+        // Returns the llama's strength for determining it's inventory.
         // -->
         if (attribute.startsWith("strength")) {
             return new ElementTag(((Llama) dentity.getBukkitEntity()).getStrength())
@@ -90,15 +90,15 @@ public class EntityStrength implements Property {
 
         // <--[mechanism]
         // @object EntityTag
-        // @name arms
-        // @input ElementTag(Boolean)
+        // @name strength
+        // @input ElementTag(Number)
         // @description
-        // Changes the arms state of an armor stand.
+        // set the llama's strength for determining it's inventory.
         // @tags
-        // <EntityTag.arms>
+        // <EntityTag.strength>
         // -->
 
-        if (mechanism.matches("arms") && mechanism.requireInteger()) {
+        if (mechanism.matches("strength") && mechanism.requireInteger()) {
             int strength = mechanism.getValue().asInt();
             if (strength < 1 || strength > 5) {
                 Debug.echoError("Strength value '" + strength + "' is not valid. Must be between 1 and 5.");
