@@ -11,7 +11,6 @@ import org.bukkit.entity.Horse;
 
 public class EntityJumpStrength implements Property {
 
-
     public static boolean describes(ObjectTag entity) {
         return entity instanceof EntityTag &&
                 ((EntityTag) entity).getBukkitEntityType() == EntityType.HORSE;
@@ -33,7 +32,6 @@ public class EntityJumpStrength implements Property {
     public static final String[] handledMechs = new String[] {
             "jump_strength"
     };
-
 
     ///////////////////
     // Instance Fields and Methods
@@ -58,7 +56,6 @@ public class EntityJumpStrength implements Property {
     public String getPropertyId() {
         return "jump_strength";
     }
-
 
     ///////////
     // ObjectTag Attributes
