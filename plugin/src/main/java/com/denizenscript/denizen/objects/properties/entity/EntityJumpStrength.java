@@ -6,10 +6,10 @@ import com.denizenscript.denizencore.objects.Mechanism;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.properties.Property;
 import com.denizenscript.denizencore.tags.Attribute;
+import org.bukkit.entity.Donkey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Mule;
-import org.bukkit.entity.Donkey;
 
 public class EntityJumpStrength implements Property {
 
@@ -31,13 +31,12 @@ public class EntityJumpStrength implements Property {
     }
 
     public static final String[] handledTags = new String[] {
-            "jump_strength"
+            "jump_strength", "jump_in_blocks"
     };
 
     public static final String[] handledMechs = new String[] {
             "jump_strength"
     };
-
 
     ///////////////////
     // Instance Fields and Methods
@@ -52,6 +51,7 @@ public class EntityJumpStrength implements Property {
     /////////
     // Property Methods
     ///////
+
     public boolean isMule() {
         return entity.getBukkitEntityType() == EntityType.MULE;
     }
@@ -75,28 +75,24 @@ public class EntityJumpStrength implements Property {
     public void setJumpStrength(double i) {
         if (isMule()) {
             ((Mule) entity.getBukkitEntity()).setJumpStrength(i);
-            return;
         }
         else if (isDonkey()) {
             ((Donkey) entity.getBukkitEntity()).setJumpStrength(i);
-            return;
         }
         else {
             ((Horse) entity.getBukkitEntity()).setJumpStrength(i);
-            return;
         }
     }
 
     @Override
     public String getPropertyString() {
-        return String.valueOf(((Horse) entity.getBukkitEntity()).getJumpStrength());
+        return String.valueOf(getJumpStrength());
     }
 
     @Override
     public String getPropertyId() {
         return "jump_strength";
     }
-
 
     ///////////
     // ObjectTag Attributes
@@ -121,7 +117,6 @@ public class EntityJumpStrength implements Property {
             return new ElementTag(getJumpStrength())
                     .getObjectAttribute(attribute.fulfill(1));
         }
-
         return null;
     }
 
@@ -137,7 +132,6 @@ public class EntityJumpStrength implements Property {
         // @tags
         // <EntityTag.jump_strength>
         // -->
-
         if (mechanism.matches("jump_strength") && mechanism.requireDouble()) {
             setJumpStrength(mechanism.getValue().asDouble());
         }
