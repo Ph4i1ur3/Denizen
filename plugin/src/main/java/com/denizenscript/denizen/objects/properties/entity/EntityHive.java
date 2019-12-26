@@ -35,7 +35,6 @@ public class EntityHive implements Property {
             "hive"
     };
 
-
     ///////////////////
     // Instance Fields and Methods
     /////////////
@@ -99,7 +98,7 @@ public class EntityHive implements Property {
         // @mechanism EntityTag.hive
         // @group properties
         // @description
-        // If the entity is a Bee, returns it's hive location, will error if it does not have one.
+        // If the entity is a Bee, returns it's hive location.
         // -->
         if (attribute.startsWith("hive")) {
             return new LocationTag(((Bee) bee.getBukkitEntity()).getHive())
