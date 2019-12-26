@@ -88,6 +88,7 @@ public class PropertyRegistry {
         PropertyParser.registerProperty(EntitySkeleton.class, EntityTag.class);
         PropertyParser.registerProperty(EntitySpeed.class, EntityTag.class);
         PropertyParser.registerProperty(EntitySpell.class, EntityTag.class);
+        PropertyParser.registerProperty(EntityStrength.class, EntityTag.class);
         PropertyParser.registerProperty(EntityTame.class, EntityTag.class);
         PropertyParser.registerProperty(EntityTrades.class, EntityTag.class);
         PropertyParser.registerProperty(EntityVisible.class, EntityTag.class);
