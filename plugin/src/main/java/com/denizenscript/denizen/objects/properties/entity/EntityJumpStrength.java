@@ -14,7 +14,9 @@ public class EntityJumpStrength implements Property {
 
     public static boolean describes(ObjectTag entity) {
         return entity instanceof EntityTag &&
-                ((EntityTag) entity).getBukkitEntityType() == EntityType.HORSE;
+                ((EntityTag) entity).getBukkitEntityType() == EntityType.HORSE ||
+                ((EntityTag) entity).getBukkitEntityType() == EntityType.LLAMA ||
+                ((EntityTag) entity).getBukkitEntityType() == EntityType.MULE;
     }
 
     public static EntityJumpStrength getFrom(ObjectTag entity) {
