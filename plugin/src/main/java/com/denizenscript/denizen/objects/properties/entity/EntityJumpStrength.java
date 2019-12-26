@@ -31,7 +31,7 @@ public class EntityJumpStrength implements Property {
     }
 
     public static final String[] handledTags = new String[] {
-            "jump_strength", "jump_in_blocks"
+            "jump_strength"
     };
 
     public static final String[] handledMechs = new String[] {
