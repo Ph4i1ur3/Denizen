@@ -32,7 +32,7 @@ public class EntityStrength implements Property {
     public static final String[] handledMechs = new String[] {
             "strength"
     };
-    
+
     ///////////////////
     // Instance Fields and Methods
     /////////////
@@ -74,7 +74,7 @@ public class EntityStrength implements Property {
         // @mechanism EntityTag.strength
         // @group properties
         // @description
-        // Returns the llama's strength for determining it's inventory.
+        // Returns the llama's strength that determines it's inventory, and intimidation level.
         // -->
         if (attribute.startsWith("strength")) {
             return new ElementTag(((Llama) dentity.getBukkitEntity()).getStrength())
@@ -92,7 +92,7 @@ public class EntityStrength implements Property {
         // @name strength
         // @input ElementTag(Number)
         // @description
-        // set the llama's strength for determining it's inventory.
+        // set the llama's strength for determining it's inventory, and intimidation level.
         // @tags
         // <EntityTag.strength>
         // -->
