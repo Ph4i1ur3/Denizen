@@ -186,6 +186,7 @@ public class BukkitCommandRegistry extends CommandRegistry {
         registerCoreMember(SchematicCommand.class, "SCHEMATIC", "schematic [create/load/unload/rotate (angle:<#>)/paste (fake_to:<player>|... fake_duration:<duration>)/save/flip_x/flip_y/flip_z) (noair) (mask:<material>|...)] [name:<name>] (filename:<name>) (<location>) (<cuboid>) (delayed)", 2);
         registerCoreMember(ScoreboardCommand.class, "SCOREBOARD", "scoreboard ({add}/remove) (viewers:<player>|...) (lines:<player>/<text>|...) (id:<value>/{main}) (objective:<value>) (criteria:<criteria>/{dummy}) (score:<#>) (displayslot:<value>/{sidebar}/none) (displayname:<name>)", 1);
         registerCoreMember(ScribeCommand.class, "SCRIBE", "scribe [<script>] (<item>/give/equip/{drop <location>})", 1);
+        registerCoreMember(ShellCommand.class, "SHELL", "shell [<shell script>] [<server name>]", 2);
         registerCoreMember(ShootCommand.class, "SHOOT", "shoot [<entity>|...] (origin:<entity>/<location>) (destination:<location>) (height:<#.#>) (speed:<#.#>) (script:<name>) (def:<element>|...) (shooter:<entity>) (spread:<#.#>) (lead:<location>) (no_rotate)", 1);
         registerCoreMember(ShowFakeCommand.class, "SHOWFAKE", "showfake [<material>|.../cancel] [<location>|...] (players:<player>|...) (d:<duration>{10s})", 2);
         registerCoreMember(SidebarCommand.class, "SIDEBAR", "sidebar (add/remove/{set}/set_line) (title:<title>) (scores:<#>|...) (values:<line>|...) (start:<#>/{num_of_lines}) (increment:<#>/{-1}) (players:<player>|...) (per_player)", 1);
