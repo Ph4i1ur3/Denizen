@@ -1519,21 +1519,19 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
         });
 
         // <--[tag]
-        // @attribute <InventoryTag.include[<item>]>
+        // @attribute <InventoryTag.include[<item>|...]>
         // @returns InventoryTag
         // @description
-        // Returns a copy of the InventoryTag with an item added.
+        // Returns a copy of the InventoryTag with items added.
         // -->
         registerTag("include", (attribute, object) -> {
             if (!attribute.hasContext(1) || !ItemTag.matches(attribute.getContext(1))) {
                 return null;
             }
-            ItemTag item = ItemTag.valueOf(attribute.getContext(1), attribute.context);
-            if (item == null) {
+            List<ItemTag> items = ListTag.getListFor(attribute.getContextObject(1)).filter(ItemTag.class, attribute.context);
+            if (items.isEmpty()) {
                 return null;
             }
-            int qty = 1;
-
             InventoryTag dummyInv = new InventoryTag(Bukkit.createInventory(null, object.inventory.getType(), NMSHandler.getInstance().getTitle(object.inventory)));
             if (object.inventory.getType() == InventoryType.CHEST) {
                 dummyInv.setSize(object.inventory.getSize());
@@ -1550,11 +1548,13 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
                 if (attribute.startsWith("qty", 2)) {
                     Deprecations.qtyTags.warn(attribute.context);
                 }
-                qty = attribute.getIntContext(2);
+                int qty = attribute.getIntContext(2);
+                items.get(0).setAmount(qty);
                 attribute.fulfill(1);
             }
-            item.setAmount(qty);
-            dummyInv.add(0, item.getItemStack());
+            for (ItemTag item: items) {
+                dummyInv.add(0, item.getItemStack());
+            }
             return dummyInv;
         });
 
@@ -2118,9 +2118,6 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
         // -->
         registerTag("location", (attribute, object) -> {
             LocationTag location = object.getLocation();
-            if (location == null) {
-                return null;
-            }
             return location;
         });
 
@@ -2250,9 +2247,6 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
         // -->
         registerTag("equipment", (attribute, object) -> {
             ListTag equipment = object.getEquipment();
-            if (equipment == null) {
-                return null;
-            }
             return equipment;
         });
 
@@ -2353,9 +2347,6 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
         // -->
         registerTag("fuel", (attribute, object) -> {
             ItemTag fuel = object.getFuel();
-            if (fuel == null) {
-                return null;
-            }
             return fuel;
         });
 
@@ -2368,9 +2359,6 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
         // -->
         registerTag("input", (attribute, object) -> {
             ItemTag smelting = object.getInput();
-            if (smelting == null) {
-                return null;
-            }
             return smelting;
         });
         registerTag("smelting", tagProcessor.registeredObjectTags.get("input"));

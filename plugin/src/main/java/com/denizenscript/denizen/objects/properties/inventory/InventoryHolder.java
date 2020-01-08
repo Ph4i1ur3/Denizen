@@ -36,10 +36,6 @@ public class InventoryHolder implements Property {
             "holder"
     };
 
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     InventoryTag inventory;
     ObjectTag holder;
 
@@ -133,11 +129,6 @@ public class InventoryHolder implements Property {
         }
     }
 
-
-    /////////
-    // Property Methods
-    ///////
-
     @Override
     public String getPropertyString() {
         if (holder == null || (inventory.getIdType().equals("generic")
@@ -154,11 +145,6 @@ public class InventoryHolder implements Property {
         return "holder";
     }
 
-
-    ///////////
-    // ObjectTag Attributes
-    ////////
-
     public static void registerTags() {
 
         // <--[tag]
@@ -167,13 +153,10 @@ public class InventoryHolder implements Property {
         // @group properties
         // @mechanism InventoryTag.holder
         // @description
-        // Returns Denizen's holder ID for this inventory. (p@joe, l@123,321,123,world, etc.)
+        // Returns Denizen's holder ID for this inventory. (player object, location object, etc.)
         // -->
         PropertyParser.<InventoryHolder>registerTag("id_holder", (attribute, object) -> {
             ObjectTag holder = object.holder;
-            if (holder == null) {
-                return null;
-            }
             return holder;
         });
     }

@@ -59,11 +59,6 @@ public class EntityColor implements Property {
             "color"
     };
 
-
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     private EntityColor(EntityTag entity) {
         colored = entity;
     }
@@ -122,10 +117,6 @@ public class EntityColor implements Property {
         }
     }
 
-    /////////
-    // Property Methods
-    ///////
-
     @Override
     public String getPropertyString() {
         String color = getColor();
@@ -136,11 +127,6 @@ public class EntityColor implements Property {
     public String getPropertyId() {
         return "color";
     }
-
-
-    ///////////
-    // ObjectTag Attributes
-    ////////
 
     // <--[language]
     // @name Entity Color Types
@@ -170,7 +156,6 @@ public class EntityColor implements Property {
     // For all places where a DyeColor is needed, the options are:
     // BLACK, BLUE, BROWN, CYAN, GRAY, GREEN, LIGHT_BLUE, LIGHT_GRAY, LIME, MAGENTA, ORANGE, PINK, PURPLE, RED, WHITE, or YELLOW.
     // -->
-
     @Override
     public ObjectTag getObjectAttribute(Attribute attribute) {
 
@@ -209,7 +194,6 @@ public class EntityColor implements Property {
         // <EntityTag.color>
         // <EntityTag.colorable>
         // -->
-
         if (mechanism.matches("color")) {
             EntityType type = colored.getBukkitEntityType();
 

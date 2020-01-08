@@ -13,7 +13,6 @@ import com.denizenscript.denizencore.objects.properties.Property;
 import com.denizenscript.denizencore.tags.Attribute;
 import com.denizenscript.denizencore.utilities.CoreUtilities;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
@@ -242,7 +241,6 @@ public class ItemEnchantments implements Property {
         // <ItemTag.enchantments.levels>
         // <ItemTag.enchantments.with_levels>
         // -->
-
         if (mechanism.matches("enchantments")) {
             for (String enchant : mechanism.valueAsType(ListTag.class)) {
                 if (!enchant.contains(",")) {
@@ -255,14 +253,7 @@ public class ItemEnchantments implements Property {
                     }
                     else {
                         try {
-                            Enchantment ench = null;
-                            if (NMSHandler.getVersion().isAtLeast(NMSVersion.v1_13)) {
-                                NamespacedKey key = Utilities.parseNamespacedKey(data[0]);
-                                ench = Enchantment.getByKey(key);
-                            }
-                            if (ench == null) {
-                                ench = Enchantment.getByName(data[0].toUpperCase());
-                            }
+                            Enchantment ench = Utilities.getEnchantmentByName(data[0]);
                             if (ench != null) {
                                 if (item.getItemStack().getType() == Material.ENCHANTED_BOOK) {
                                     EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemStack().getItemMeta();

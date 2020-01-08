@@ -95,9 +95,7 @@ public class ServerTagBase {
 
         if (attribute.startsWith("economy")) {
             if (Depends.economy == null) {
-                if (!attribute.hasAlternative()) {
-                    Debug.echoError("No economy loaded! Have you installed Vault and a compatible economy plugin?");
-                }
+                attribute.echoError("No economy loaded! Have you installed Vault and a compatible economy plugin?");
                 return;
             }
             attribute = attribute.fulfill(1);
@@ -370,7 +368,7 @@ public class ServerTagBase {
 
         // <--[tag]
         // @attribute <server.object_is_valid[<object>]>
-        // @returns ElementTag(boolean)
+        // @returns ElementTag(Boolean)
         // @description
         // Returns whether the object is a valid object (non-null), as well as not an Element.
         // -->
@@ -382,7 +380,7 @@ public class ServerTagBase {
 
         // <--[tag]
         // @attribute <server.has_whitelist>
-        // @returns ElementTag(boolean)
+        // @returns ElementTag(Boolean)
         // @description
         // Returns true if the server's whitelist is active, otherwise returns false.
         // -->
@@ -393,7 +391,7 @@ public class ServerTagBase {
 
         // <--[tag]
         // @attribute <server.has_flag[<flag_name>]>
-        // @returns ElementTag(boolean)
+        // @returns ElementTag(Boolean)
         // @description
         // Returns true if the server has the specified flag, otherwise returns false.
         // -->
@@ -479,10 +477,7 @@ public class ServerTagBase {
         // Returns a list of all registered command names in Bukkit.
         // -->
         if (attribute.startsWith("list_commands")) {
-            ListTag list = new ListTag();
-            for (String cmd : CommandScriptHelper.knownCommands.keySet()) {
-                list.add(cmd);
-            }
+            ListTag list = new ListTag(CommandScriptHelper.knownCommands.keySet());
             event.setReplaced(list.getAttribute(attribute.fulfill(1)));
             return;
         }
@@ -809,6 +804,21 @@ public class ServerTagBase {
         }
 
         // <--[tag]
+        // @attribute <server.list_structure_types>
+        // @returns ListTag
+        // @description
+        // Returns a list of all structure types known to the server.
+        // Generally used with <@link tag LocationTag.find.structure.within>.
+        // This is NOT their Bukkit names, as seen at <@link url https://hub.spigotmc.org/javadocs/spigot/org/bukkit/StructureType.html>.
+        // Instead these are the internal names tracked by Spigot and presumably matching Minecraft internals.
+        // These are all lowercase, as the internal names are lowercase and supposedly are case-sensitive.
+        // It is unclear why the "StructureType" class in Bukkit is not simply an enum as most similar listings are.
+        // -->
+        if (attribute.startsWith("list_structure_types")) {
+            event.setReplaced(new ListTag(StructureType.getStructureTypes().keySet()).getAttribute(attribute.fulfill(1)));
+        }
+
+        // <--[tag]
         // @attribute <server.list_flags[(regex:)<search>]>
         // @returns ListTag
         // @description
@@ -899,6 +909,38 @@ public class ServerTagBase {
                 return;
             }
             event.setReplaced(new ElementTag(statistic.getType().name()).getAttribute(attribute.fulfill(1)));
+        }
+
+        // <--[tag]
+        // @attribute <server.enchantment_max_level[<enchantment>]>
+        // @returns ElementTag(Integer)
+        // @description
+        // Returns the max level (at an enchantment table) for the given enchantment.
+        // Refer also to <@link tag server.list_enchantments>.
+        // -->
+        if (attribute.startsWith("enchantment_max_level") && attribute.hasContext(1)) {
+            Enchantment ench = Utilities.getEnchantmentByName(attribute.getContext(1));
+            if (ench == null) {
+                attribute.echoError("Enchantment '" + attribute.getContext(1) + "' does not exist.");
+                return;
+            }
+            event.setReplaced(new ElementTag(ench.getMaxLevel()).getAttribute(attribute.fulfill(1)));
+        }
+
+        // <--[tag]
+        // @attribute <server.enchantment_start_level[<enchantment>]>
+        // @returns ElementTag(Integer)
+        // @description
+        // Returns the starting level (at an enchantment table) for the given enchantment.
+        // Refer also to <@link tag server.list_enchantments>.
+        // -->
+        if (attribute.startsWith("enchantment_start_level") && attribute.hasContext(1)) {
+            Enchantment ench = Utilities.getEnchantmentByName(attribute.getContext(1));
+            if (ench == null) {
+                attribute.echoError("Enchantment '" + attribute.getContext(1) + "' does not exist.");
+                return;
+            }
+            event.setReplaced(new ElementTag(ench.getStartLevel()).getAttribute(attribute.fulfill(1)));
         }
 
         // <--[tag]
@@ -1053,7 +1095,7 @@ public class ServerTagBase {
             List<WorldScriptContainer> EventsOne = OldEventManager.events.get("ON " + eventName);
             List<WorldScriptContainer> EventsTwo = OldEventManager.events.get("ON " + OldEventManager.StripIdentifiers(eventName));
             if (EventsOne == null && EventsTwo == null) {
-                Debug.echoError("No world scripts will handle the event '" + eventName + "'");
+                attribute.echoError("No world scripts will handle the event '" + eventName + "'");
             }
             else {
                 ListTag list = new ListTag();
@@ -1118,9 +1160,7 @@ public class ServerTagBase {
             File f = new File(DenizenAPI.getCurrentInstance().getDataFolder(), attribute.getContext(1));
             try {
                 if (!Utilities.canReadFile(f)) {
-                    if (!attribute.hasAlternative()) {
-                        Debug.echoError("Invalid path specified. Invalid paths have been denied by the server administrator.");
-                    }
+                    attribute.echoError("Invalid path specified. Invalid paths have been denied by the server administrator.");
                     return;
                 }
             }
@@ -1142,15 +1182,11 @@ public class ServerTagBase {
             File folder = new File(DenizenAPI.getCurrentInstance().getDataFolder(), attribute.getContext(1));
             try {
                 if (!Utilities.canReadFile(folder)) {
-                    if (!attribute.hasAlternative()) {
-                        Debug.echoError("Invalid path specified. Invalid paths have been denied by the server administrator.");
-                    }
+                    attribute.echoError("Invalid path specified. Invalid paths have been denied by the server administrator.");
                     return;
                 }
                 if (!folder.exists() || !folder.isDirectory()) {
-                    if (!attribute.hasAlternative()) {
-                        Debug.echoError("Invalid path specified. No directory exists at that path.");
-                    }
+                    attribute.echoError("Invalid path specified. No directory exists at that path.");
                     return;
                 }
             }
@@ -1290,14 +1326,14 @@ public class ServerTagBase {
         if (attribute.startsWith("group_prefix")) {
 
             if (Depends.permissions == null) {
-                Debug.echoError("No permission system loaded! Have you installed Vault and a compatible permissions plugin?");
+                attribute.echoError("No permission system loaded! Have you installed Vault and a compatible permissions plugin?");
                 return;
             }
 
             String group = attribute.getContext(1);
 
             if (!Arrays.asList(Depends.permissions.getGroups()).contains(group)) {
-                Debug.echoError("Invalid group! '" + (group != null ? group : "") + "' could not be found.");
+                attribute.echoError("Invalid group! '" + (group != null ? group : "") + "' could not be found.");
                 return;
             }
 
@@ -1331,14 +1367,14 @@ public class ServerTagBase {
         if (attribute.startsWith("group_suffix")) {
 
             if (Depends.permissions == null) {
-                Debug.echoError("No permission system loaded! Have you installed Vault and a compatible permissions plugin?");
+                attribute.echoError("No permission system loaded! Have you installed Vault and a compatible permissions plugin?");
                 return;
             }
 
             String group = attribute.getContext(1);
 
             if (!Arrays.asList(Depends.permissions.getGroups()).contains(group)) {
-                Debug.echoError("Invalid group! '" + (group != null ? group : "") + "' could not be found.");
+                attribute.echoError("Invalid group! '" + (group != null ? group : "") + "' could not be found.");
                 return;
             }
 
@@ -1371,7 +1407,7 @@ public class ServerTagBase {
         // -->
         if (attribute.startsWith("list_permission_groups")) {
             if (Depends.permissions == null) {
-                Debug.echoError("No permission system loaded! Have you installed Vault and a compatible permissions plugin?");
+                attribute.echoError("No permission system loaded! Have you installed Vault and a compatible permissions plugin?");
                 return;
             }
             event.setReplaced(new ListTag(Arrays.asList(Depends.permissions.getGroups())).getAttribute(attribute.fulfill(1)));
@@ -1408,8 +1444,8 @@ public class ServerTagBase {
         // @returns PlayerTag
         // @description
         // Returns the online player that best matches the input name.
-        // EG, in a group of 'bo', 'bob', and 'bobby'... input 'bob' returns p@bob,
-        // input 'bobb' returns p@bobby, and input 'b' returns p@bo.
+        // EG, in a group of 'bo', 'bob', and 'bobby'... input 'bob' returns player object for 'bob',
+        // input 'bobb' returns player object for 'bobby', and input 'b' returns player object for 'bo'.
         // -->
         if (attribute.startsWith("match_player") && attribute.hasContext(1)) {
             Player matchPlayer = null;
@@ -1436,8 +1472,8 @@ public class ServerTagBase {
         // @returns PlayerTag
         // @description
         // Returns any player (online or offline) that best matches the input name.
-        // EG, in a group of 'bo', 'bob', and 'bobby'... input 'bob' returns p@bob,
-        // input 'bobb' returns p@bobby, and input 'b' returns p@bo.
+        // EG, in a group of 'bo', 'bob', and 'bobby'... input 'bob' returns player object for 'bob',
+        // input 'bobb' returns player object for 'bobby', and input 'b' returns player object for 'bo'.
         // -->
         if (attribute.startsWith("match_offline_player") && attribute.hasContext(1)) {
             UUID matchPlayer = null;
@@ -1469,7 +1505,7 @@ public class ServerTagBase {
                 && attribute.hasContext(1)) {
             ScriptTag script = ScriptTag.valueOf(attribute.getContext(1));
             if (script == null || !(script.getContainer() instanceof AssignmentScriptContainer)) {
-                Debug.echoError("Invalid script specified.");
+                attribute.echoError("Invalid script specified.");
             }
             else {
                 ListTag npcs = new ListTag();
@@ -1876,10 +1912,7 @@ public class ServerTagBase {
         // Returns a list of all currently active boss bar IDs.
         // -->
         else if (attribute.startsWith("current_bossbars")) {
-            ListTag dl = new ListTag();
-            for (String str : BossBarCommand.bossBarMap.keySet()) {
-                dl.add(str);
-            }
+            ListTag dl = new ListTag(BossBarCommand.bossBarMap.keySet());
             event.setReplaced(dl.getAttribute(attribute.fulfill(1)));
         }
 

@@ -88,10 +88,21 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
     public String backupWorld;
 
     public String getWorldName() {
-        if (getWorld() != null) {
-            return getWorld().getName();
+        World w = super.getWorld();
+        if (w != null) {
+            return w.getName();
         }
         return backupWorld;
+    }
+
+    @Override
+    public World getWorld() {
+        World w = super.getWorld();
+        if (w != null) {
+            return w;
+        }
+        super.setWorld(Bukkit.getWorld(backupWorld));
+        return super.getWorld();
     }
 
     @Override
@@ -271,13 +282,12 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
         // x,y,z,pitch,yaw
         {
             try {
-                LocationTag output = new LocationTag(null,
+                return new LocationTag(null,
                         Double.valueOf(split.get(0)),
                         Double.valueOf(split.get(1)),
                         Double.valueOf(split.get(2)),
                         Float.valueOf(split.get(3)),
                         Float.valueOf(split.get(4)));
-                return output;
             }
             catch (Exception e) {
                 if (context == null || context.debug) {
@@ -1044,8 +1054,7 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
             if (!object.isChunkLoadedSafe()) {
                 return null;
             }
-            ObjectTag obj = ElementTag.handleNull(object.identify() + ".inventory", object.getInventory(), "InventoryTag", attribute.hasAlternative());
-            return obj;
+            return ElementTag.handleNull(object.identify() + ".inventory", object.getInventory(), "InventoryTag", attribute.hasAlternative());
         });
 
         // <--[tag]
@@ -1068,7 +1077,7 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
         // @group properties
         // @mechanism LocationTag.patterns
         // @description
-        // Lists the patterns of the banner at this location in the form "li@COLOR/PATTERN|COLOR/PATTERN" etc.
+        // Lists the patterns of the banner at this location in the form "COLOR/PATTERN|COLOR/PATTERN" etc.
         // For the list of possible colors, see <@link url http://bit.ly/1dydq12>.
         // For the list of possible patterns, see <@link url http://bit.ly/1MqRn7T>.
         // -->
@@ -1981,11 +1990,8 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
             // for the entity type.
             // -->
             else if (attribute.startsWith("entities", 2)) {
-                ListTag ent_list = new ListTag();
-                if (attribute.hasContext(2)) {
-                    ent_list = ListTag.valueOf(attribute.getContext(2));
-                }
-                ArrayList<EntityTag> found = new ArrayList<>();
+                ListTag ent_list = attribute.hasContext(2) ? ListTag.valueOf(attribute.getContext(2)) : new ListTag();
+                ListTag found = new ListTag();
                 attribute.fulfill(2);
                 for (Entity entity : new WorldTag(object.getWorld()).getEntitiesForTag()) {
                     if (Utilities.checkLocation(object, entity.getLocation(), radius)) {
@@ -1993,25 +1999,25 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
                         if (!ent_list.isEmpty()) {
                             for (String ent : ent_list) {
                                 if (current.comparedTo(ent)) {
-                                    found.add(current);
+                                    found.addObject(current.getDenizenObject());
                                     break;
                                 }
                             }
                         }
                         else {
-                            found.add(current);
+                            found.addObject(current.getDenizenObject());
                         }
                     }
                 }
 
-                Collections.sort(found, new Comparator<EntityTag>() {
+                Collections.sort(found.objectForms, new Comparator<ObjectTag>() {
                     @Override
-                    public int compare(EntityTag ent1, EntityTag ent2) {
-                        return object.compare(ent1.getLocation(), ent2.getLocation());
+                    public int compare(ObjectTag ent1, ObjectTag ent2) {
+                        return object.compare(((EntityFormObject) ent1).getLocation(), ((EntityFormObject) ent2).getLocation());
                     }
                 });
 
-                return new ListTag(found);
+                return new ListTag(found.objectForms);
             }
 
             // <--[tag]
@@ -2021,23 +2027,69 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
             // Returns a list of living entities within a radius.
             // -->
             else if (attribute.startsWith("living_entities", 2)) {
-                ArrayList<EntityTag> found = new ArrayList<>();
+                ListTag found = new ListTag();
                 attribute.fulfill(2);
                 for (Entity entity : new WorldTag(object.getWorld()).getEntitiesForTag()) {
                     if (entity instanceof LivingEntity
                             && Utilities.checkLocation(object, entity.getLocation(), radius)) {
-                        found.add(new EntityTag(entity));
+                        found.addObject(new EntityTag(entity).getDenizenObject());
                     }
                 }
 
-                Collections.sort(found, new Comparator<EntityTag>() {
+                Collections.sort(found.objectForms, new Comparator<ObjectTag>() {
                     @Override
-                    public int compare(EntityTag ent1, EntityTag ent2) {
-                        return object.compare(ent1.getLocation(), ent2.getLocation());
+                    public int compare(ObjectTag ent1, ObjectTag ent2) {
+                        return object.compare(((EntityFormObject) ent1).getLocation(), ((EntityFormObject) ent2).getLocation());
                     }
                 });
 
-                return new ListTag(found);
+                return new ListTag(found.objectForms);
+            }
+
+            // <--[tag]
+            // @attribute <LocationTag.find.structure[<type>].within[<#.#>]>
+            // @returns LocationTag
+            // @description
+            // Returns the location of the nearest structure of the given type, within a maximum radius.
+            // To get a list of valid structure types, use <@link tag server.list_structure_types>.
+            // Note that structure type names are case sensitive, and likely to be all-lowercase in most cases.
+            // -->
+            else if (attribute.startsWith("structure", 2) && attribute.hasContext(2)) {
+                String typeName = attribute.getContext(2);
+                StructureType type = StructureType.getStructureTypes().get(typeName);
+                if (type == null) {
+                    attribute.echoError("Invalid structure type '" + typeName + "'.");
+                    return null;
+                }
+                attribute.fulfill(2);
+                Location result = object.getWorld().locateNearestStructure(object, type, (int) radius, false);
+                if (result == null) {
+                    return null;
+                }
+                return new LocationTag(result);
+            }
+
+            // <--[tag]
+            // @attribute <LocationTag.find.unexplored_structure[<type>].within[<#.#>]>
+            // @returns LocationTag
+            // @description
+            // Returns the location of the nearest unexplored structure of the given type, within a maximum radius.
+            // To get a list of valid structure types, use <@link tag server.list_structure_types>.
+            // Note that structure type names are case sensitive, and likely to be all-lowercase in most cases.
+            // -->
+            else if (attribute.startsWith("unexplored_structure", 2) && attribute.hasContext(2)) {
+                String typeName = attribute.getContext(2);
+                StructureType type = StructureType.getStructureTypes().get(typeName);
+                if (type == null) {
+                    attribute.echoError("Invalid structure type '" + typeName + "'.");
+                    return null;
+                }
+                attribute.fulfill(2);
+                Location result = object.getWorld().locateNearestStructure(object, type, (int) radius, true);
+                if (result == null) {
+                    return null;
+                }
+                return new LocationTag(result);
             }
             return null;
         });
@@ -3303,8 +3355,7 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
         // @name patterns
         // @input ListTag
         // @description
-        // Changes the patterns of the banner at this location. Input must be in the form
-        // "li@COLOR/PATTERN|COLOR/PATTERN" etc.
+        // Changes the patterns of the banner at this location. Input must be in the form "COLOR/PATTERN|COLOR/PATTERN" etc.
         // For the list of possible colors, see <@link url http://bit.ly/1dydq12>.
         // For the list of possible patterns, see <@link url http://bit.ly/1MqRn7T>.
         // @tags

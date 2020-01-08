@@ -32,20 +32,11 @@ public class EntityBasePlate implements Property {
             "base_plate"
     };
 
-
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     private EntityBasePlate(EntityTag entity) {
         dentity = entity;
     }
 
     EntityTag dentity;
-
-    /////////
-    // Property Methods
-    ///////
 
     @Override
     public String getPropertyString() {
@@ -61,10 +52,6 @@ public class EntityBasePlate implements Property {
     public String getPropertyId() {
         return "base_plate";
     }
-
-    ///////////
-    // ObjectTag Attributes
-    ////////
 
     @Override
     public ObjectTag getObjectAttribute(Attribute attribute) {
@@ -101,7 +88,6 @@ public class EntityBasePlate implements Property {
         // @tags
         // <EntityTag.base_plate>
         // -->
-
         if (mechanism.matches("base_plate") && mechanism.requireBoolean()) {
             ((ArmorStand) dentity.getBukkitEntity()).setBasePlate(mechanism.getValue().asBoolean());
         }

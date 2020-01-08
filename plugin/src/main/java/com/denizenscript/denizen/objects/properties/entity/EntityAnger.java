@@ -40,20 +40,11 @@ public class EntityAnger implements Property {
             "anger"
     };
 
-
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     private EntityAnger(EntityTag entity) {
         this.entity = entity;
     }
 
     EntityTag entity;
-
-    /////////
-    // Property Methods
-    ///////
 
     @Override
     public String getPropertyString() {
@@ -64,10 +55,6 @@ public class EntityAnger implements Property {
     public String getPropertyId() {
         return "anger";
     }
-
-    ///////////
-    // ObjectTag Attributes
-    ////////
 
     public int getAnger() {
         if (entity.getBukkitEntity() instanceof PigZombie) {
@@ -113,7 +100,6 @@ public class EntityAnger implements Property {
         // @tags
         // <EntityTag.anger>
         // -->
-
         if (mechanism.matches("anger") && mechanism.requireInteger()) {
             if (entity.getBukkitEntity() instanceof PigZombie) {
                 ((PigZombie) entity.getBukkitEntity()).setAnger(mechanism.getValue().asInt());

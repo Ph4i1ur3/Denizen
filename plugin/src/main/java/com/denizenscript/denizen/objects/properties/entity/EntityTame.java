@@ -37,20 +37,11 @@ public class EntityTame implements Property {
             "tame", "owner"
     };
 
-
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     private EntityTame(EntityTag tame) {
         entity = tame;
     }
 
     EntityTag entity;
-
-    /////////
-    // Property Methods
-    ///////
 
     @Override
     public String getPropertyString() {
@@ -72,11 +63,6 @@ public class EntityTame implements Property {
     public String getPropertyId() {
         return "tame";
     }
-
-
-    ///////////
-    // ObjectTag Attributes
-    ////////
 
     @Override
     public ObjectTag getObjectAttribute(Attribute attribute) {
@@ -133,7 +119,6 @@ public class EntityTame implements Property {
         // <EntityTag.is_tamed>
         // <EntityTag.tameable>
         // -->
-
         if (mechanism.matches("tame")) {
             ListTag list = mechanism.valueAsType(ListTag.class);
             if (list.size() == 0) {
@@ -163,7 +148,6 @@ public class EntityTame implements Property {
         // <EntityTag.tameable>
         // <EntityTag.owner>
         // -->
-
         if (mechanism.matches("owner")) {
             if (mechanism.hasValue() && mechanism.requireObject(PlayerTag.class)) {
                 ((Tameable) entity.getBukkitEntity()).setOwner(mechanism.valueAsType(PlayerTag.class).getOfflinePlayer());

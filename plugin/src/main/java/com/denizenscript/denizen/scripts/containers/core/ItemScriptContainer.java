@@ -1,7 +1,5 @@
 package com.denizenscript.denizen.scripts.containers.core;
 
-import com.denizenscript.denizen.nms.NMSHandler;
-import com.denizenscript.denizen.nms.NMSVersion;
 import com.denizenscript.denizen.utilities.Utilities;
 import com.denizenscript.denizencore.utilities.debugging.Debug;
 import com.denizenscript.denizen.utilities.nbt.LeatherColorer;
@@ -18,7 +16,6 @@ import com.denizenscript.denizencore.tags.TagManager;
 import com.denizenscript.denizencore.utilities.Deprecations;
 import com.denizenscript.denizencore.utilities.YamlConfiguration;
 import com.denizenscript.denizencore.utilities.text.StringHolder;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -40,13 +37,13 @@ public class ItemScriptContainer extends ScriptContainer {
     //
     // <code>
     // # The name of the item script is the same name that you can use to construct a new
-    // # ItemTag based on this item script. For example, an item script named 'sword of swiftness'
-    // # can be referred to as 'sword of swiftness'.
+    // # ItemTag based on this item script. For example, an item script named 'sword_of_swiftness'
+    // # can be referred to as simply 'sword_of_swiftness'.
     // Item_Script_Name:
     //
     //   type: item
     //
-    //   # Must be a valid ItemTag (EG red_wool or potion,8226) See 'ItemTag' for more information.
+    //   # Must be a valid ItemTag. See 'ItemTag' for more information.
     //   # | All item scripts MUST have this key!
     //   material: base_material
     //
@@ -274,14 +271,7 @@ public class ItemScriptContainer extends ScriptContainer {
                             enchantment = split[0].replace(" ", "");
                         }
                         // Add enchantment
-                        Enchantment ench = null;
-                        if (NMSHandler.getVersion().isAtLeast(NMSVersion.v1_13)) {
-                            NamespacedKey key = Utilities.parseNamespacedKey(enchantment);
-                            ench = Enchantment.getByKey(key);
-                        }
-                        if (ench == null) {
-                            ench = Enchantment.getByName(enchantment.toUpperCase());
-                        }
+                        Enchantment ench = Utilities.getEnchantmentByName(enchantment);
                         stack.getItemStack().addUnsafeEnchantment(ench, level);
                     }
                     catch (Exception ex) {

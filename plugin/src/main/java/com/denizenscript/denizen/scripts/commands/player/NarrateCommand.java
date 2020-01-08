@@ -49,7 +49,7 @@ public class NarrateCommand extends AbstractCommand {
     //
     // @Usage
     // Use to narrate text to a list of players.
-    // - narrate "Hello there." targets:p@bob|p@steve|p@john
+    // - narrate "Hello there." targets:<[player]>|<[someplayer]>|<[thatplayer]>
     //
     // @Usage
     // Use to narrate text to a unique message to every player on the server.
@@ -132,6 +132,7 @@ public class NarrateCommand extends AbstractCommand {
             if (player != null && player.isOnline()) {
                 String personalText = text;
                 if (perPlayer) {
+                    context.player = player;
                     personalText = TagManager.tag(personalText, context);
                 }
                 player.getPlayerEntity().spigot().sendMessage(FormattedTextHelper.parse(format != null ? format.getFormattedText(personalText, scriptEntry) : personalText));

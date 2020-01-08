@@ -6,20 +6,14 @@ import com.denizenscript.denizencore.objects.Mechanism;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.properties.Property;
 import com.denizenscript.denizencore.tags.Attribute;
-import org.bukkit.entity.Donkey;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.Mule;
-import org.bukkit.entity.Donkey;
+import org.bukkit.entity.AbstractHorse;
 
 public class EntityJumpStrength implements Property {
 
 
     public static boolean describes(ObjectTag entity) {
         return entity instanceof EntityTag &&
-                ((EntityTag) entity).getBukkitEntityType() == EntityType.HORSE ||
-                ((EntityTag) entity).getBukkitEntityType() == EntityType.DONKEY ||
-                ((EntityTag) entity).getBukkitEntityType() == EntityType.MULE;
+                ((EntityTag) entity).getBukkitEntity() instanceof AbstractHorse;
     }
 
     public static EntityJumpStrength getFrom(ObjectTag entity) {
@@ -39,66 +33,21 @@ public class EntityJumpStrength implements Property {
             "jump_strength"
     };
 
-
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     private EntityJumpStrength(EntityTag ent) {
         entity = ent;
     }
 
     EntityTag entity;
 
-    /////////
-    // Property Methods
-    ///////
-    public boolean isMule() {
-        return entity.getBukkitEntityType() == EntityType.MULE;
-    }
-
-    public boolean isDonkey() {
-        return entity.getBukkitEntityType() == EntityType.DONKEY;
-    }
-
-    public double getJumpStrength() {
-        if (isMule()) {
-            return ((Mule) entity.getBukkitEntity()).getJumpStrength();
-        }
-        else if (isDonkey()) {
-            return ((Donkey) entity.getBukkitEntity()).getJumpStrength();
-        }
-        else {
-            return ((Horse) entity.getBukkitEntity()).getJumpStrength();
-        }
-    }
-
-    public void setJumpStrength(double i) {
-        if (isMule()) {
-            ((Mule) entity.getBukkitEntity()).setJumpStrength(i);
-        }
-        else if (isDonkey()) {
-            ((Donkey) entity.getBukkitEntity()).setJumpStrength(i);
-        }
-        else {
-            ((Horse) entity.getBukkitEntity()).setJumpStrength(i);
-        }
-    }
-
     @Override
     public String getPropertyString() {
-        return String.valueOf(getJumpStrength());
+        return String.valueOf(((AbstractHorse) entity.getBukkitEntity()).getJumpStrength());
     }
 
     @Override
     public String getPropertyId() {
         return "jump_strength";
     }
-
-
-    ///////////
-    // ObjectTag Attributes
-    ////////
 
     @Override
     public ObjectTag getObjectAttribute(Attribute attribute) {
@@ -114,9 +63,10 @@ public class EntityJumpStrength implements Property {
         // @group properties
         // @description
         // Returns the power of a horse's jump.
+        // Also applies to horse-like mobs, such as donkeys and mules.
         // -->
         if (attribute.startsWith("jump_strength")) {
-            return new ElementTag(getJumpStrength())
+            return new ElementTag(((AbstractHorse) entity.getBukkitEntity()).getJumpStrength())
                     .getObjectAttribute(attribute.fulfill(1));
         }
 
@@ -128,9 +78,8 @@ public class EntityJumpStrength implements Property {
         // Returns the power of a horse's jump in blocks.
         // -->
         if (attribute.startsWith("jump_in_blocks")) {
-            double x = getJumpStrength();
-            return new ElementTag(-0.1817584952 * Math.pow(x, 3) + 3.689713992 * Math.pow(x, 2) + 2.128599134 * x - 0.343930367)
-                    .getObjectAttribute(attribute.fulfill(1));
+            double x = ((AbstractHorse) entity.getBukkitEntity()).getJumpStrength();
+            return new ElementTag(-0.1817584952 * Math.pow(x, 3) + 3.689713992 * Math.pow(x, 2) + 2.128599134 * x - 0.343930367);
         }
 
         return null;
@@ -145,11 +94,12 @@ public class EntityJumpStrength implements Property {
         // @input ElementTag(Number)
         // @description
         // Sets the power of the horse's jump.
+        // Also applies to horse-like mobs, such as donkeys and mules.
         // @tags
         // <EntityTag.jump_strength>
         // -->
         if (mechanism.matches("jump_strength") && mechanism.requireDouble()) {
-            setJumpStrength(mechanism.getValue().asDouble());
+            ((AbstractHorse) entity.getBukkitEntity()).setJumpStrength(mechanism.getValue().asDouble());
         }
     }
 }

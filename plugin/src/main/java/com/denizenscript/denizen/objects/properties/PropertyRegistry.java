@@ -52,7 +52,6 @@ public class PropertyRegistry {
         PropertyParser.registerProperty(EntityCustomName.class, EntityTag.class);
         PropertyParser.registerProperty(EntityDisabledSlots.class, EntityTag.class);
         PropertyParser.registerProperty(EntityPotionEffects.class, EntityTag.class);
-        PropertyParser.registerProperty(EntityElder.class, EntityTag.class);
         PropertyParser.registerProperty(EntityEquipment.class, EntityTag.class);
         PropertyParser.registerProperty(EntityExplosionFire.class, EntityTag.class);
         PropertyParser.registerProperty(EntityExplosionRadius.class, EntityTag.class);
@@ -81,11 +80,11 @@ public class PropertyRegistry {
             PropertyParser.registerProperty(EntityRiptide.class, EntityTag.class);
         }
         PropertyParser.registerProperty(EntityRotation.class, EntityTag.class);
+        PropertyParser.registerProperty(EntityScoreboardTags.class, EntityTag.class);
         PropertyParser.registerProperty(EntitySmall.class, EntityTag.class);
         PropertyParser.registerProperty(EntitySilent.class, EntityTag.class);
         PropertyParser.registerProperty(EntitySitting.class, EntityTag.class);
         PropertyParser.registerProperty(EntitySize.class, EntityTag.class);
-        PropertyParser.registerProperty(EntitySkeleton.class, EntityTag.class);
         PropertyParser.registerProperty(EntitySpeed.class, EntityTag.class);
         PropertyParser.registerProperty(EntitySpell.class, EntityTag.class);
         PropertyParser.registerProperty(EntityStrength.class, EntityTag.class);

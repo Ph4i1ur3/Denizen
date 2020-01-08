@@ -250,6 +250,7 @@ public class NPCTag implements ObjectTag, Adjustable, InventoryHolder, EntityFor
         getCitizen().destroy();
     }
 
+    @Override
     public LocationTag getLocation() {
         if (isSpawned()) {
             return new LocationTag(getEntity().getLocation());
@@ -848,7 +849,7 @@ public class NPCTag implements ObjectTag, Adjustable, InventoryHolder, EntityFor
         // @returns ElementTag
         // @mechanism NPCTag.skin
         // @description
-        // Returns whether the NPC has a custom skinskin.
+        // Returns whether the NPC has a custom skin.
         // -->
         registerTag("has_skin", (attribute, object) -> {
             return new ElementTag(object.getCitizen().data().has(NPC.PLAYER_SKIN_UUID_METADATA));
@@ -1254,14 +1255,19 @@ public class NPCTag implements ObjectTag, Adjustable, InventoryHolder, EntityFor
         // <--[mechanism]
         // @object NPCTag
         // @name owner
-        // @input Element
+        // @input PlayerTag
         // @description
         // Sets the owner of the NPC.
         // @tags
         // <NPCTag.owner>
         // -->
         if (mechanism.matches("owner")) {
-            getCitizen().getTrait(Owner.class).setOwner(mechanism.getValue().asString());
+            if (PlayerTag.matches(mechanism.getValue().asString())) {
+                getCitizen().getTrait(Owner.class).setOwner(mechanism.valueAsType(PlayerTag.class).getPlayerEntity());
+            }
+            else {
+                getCitizen().getTrait(Owner.class).setOwner(mechanism.getValue().asString());
+            }
         }
 
         // <--[mechanism]

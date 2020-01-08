@@ -45,11 +45,6 @@ public class EntityPotionEffects implements Property {
             "potion_effects"
     };
 
-
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     private EntityPotionEffects(EntityTag entity) {
         this.entity = entity;
     }
@@ -65,10 +60,6 @@ public class EntityPotionEffects implements Property {
         }
         return new ArrayList<>();
     }
-
-    /////////
-    // Property Methods
-    ///////
 
     public String getPropertyString() {
         Collection<PotionEffect> effects = getEffectsList();
@@ -98,7 +89,7 @@ public class EntityPotionEffects implements Property {
         // @group attribute
         // @mechanism EntityTag.potion_effects
         // @description
-        // Returns the list of active potion effects on the entity, in the format: li@TYPE,AMPLIFIER,DURATION,IS_AMBIENT,HAS_PARTICLES,HAS_ICON|...
+        // Returns the list of active potion effects on the entity, in the format: TYPE,AMPLIFIER,DURATION,IS_AMBIENT,HAS_PARTICLES,HAS_ICON|...
         // Note that AMPLIFIER is a number representing the level, and DURATION is a number representing the time, in ticks, it will last for.
         // IS_AMBIENT, HAS_PARTICLES, and HAS_ICON are booleans.
         // -->

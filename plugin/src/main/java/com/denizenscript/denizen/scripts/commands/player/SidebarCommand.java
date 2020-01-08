@@ -70,7 +70,7 @@ public class SidebarCommand extends AbstractCommand {
     //
     // @Usage
     // Use to show a few players their ping.
-    // - sidebar set title:Info "values:Ping<&co> <player.ping>" players:p@steve|p@bob|p@joe per_player
+    // - sidebar set title:Info "values:Ping<&co> <player.ping>" players:<[someplayer]>|<[player]>|<[aplayer]> per_player
     //
     // @Usage
     // Use to set a sidebar with the score values indicating information to the user.
@@ -491,9 +491,7 @@ public class SidebarCommand extends AbstractCommand {
         @EventHandler
         public void onPlayerQuit(PlayerQuitEvent event) {
             UUID uuid = event.getPlayer().getUniqueId();
-            if (sidebars.containsKey(uuid)) {
-                sidebars.remove(uuid);
-            }
+            sidebars.remove(uuid);
         }
     }
 }

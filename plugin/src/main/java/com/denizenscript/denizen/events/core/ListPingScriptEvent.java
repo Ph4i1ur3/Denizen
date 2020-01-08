@@ -1,12 +1,18 @@
 package com.denizenscript.denizen.events.core;
 
 import com.denizenscript.denizen.events.BukkitScriptEvent;
+import com.denizenscript.denizen.utilities.DenizenAPI;
 import com.denizenscript.denizencore.objects.core.ElementTag;
 import com.denizenscript.denizencore.objects.core.ListTag;
 import com.denizenscript.denizencore.objects.ObjectTag;
+import com.denizenscript.denizencore.utilities.debugging.Debug;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class ListPingScriptEvent extends BukkitScriptEvent implements Listener {
 
@@ -24,7 +30,7 @@ public class ListPingScriptEvent extends BukkitScriptEvent implements Listener {
     // <context.address> returns the IP address requesting the list.
     //
     // @Determine
-    // ElementTag(Number) to change the max player amount that will show
+    // ElementTag(Number) to change the max player amount that will show.
     // ElementTag to change the MOTD that will show.
     //
     // -->
@@ -43,11 +49,6 @@ public class ListPingScriptEvent extends BukkitScriptEvent implements Listener {
     }
 
     @Override
-    public boolean matches(ScriptPath path) {
-        return super.matches(path);
-    }
-
-    @Override
     public String getName() {
         return "ServerListPing";
     }
@@ -59,15 +60,12 @@ public class ListPingScriptEvent extends BukkitScriptEvent implements Listener {
             String[] values = determination.split("[\\|" + ListTag.internal_escape + "]", 2);
             if (new ElementTag(values[0]).isInt()) {
                 event.setMaxPlayers(new ElementTag(values[0]).asInt());
-                if (values.length == 1) {
-                    return true;
+                if (values.length == 2) {
+                    event.setMotd(values[1]);
                 }
             }
-            if (values.length == 2) {
-                event.setMotd(values[1]);
-            }
             else {
-                event.setMotd(values[0]);
+                event.setMotd(determination);
             }
             return true;
         }
@@ -96,6 +94,20 @@ public class ListPingScriptEvent extends BukkitScriptEvent implements Listener {
     @EventHandler
     public void onListPing(ServerListPingEvent event) {
         this.event = event;
+        if (!Bukkit.isPrimaryThread()) {
+            BukkitScriptEvent altEvent = (BukkitScriptEvent) clone();
+            Future future = Bukkit.getScheduler().callSyncMethod(DenizenAPI.getCurrentInstance(), () -> {
+                altEvent.fire();
+                return null;
+            });
+            try {
+                future.get(5, TimeUnit.SECONDS);
+            }
+            catch (Throwable ex) {
+                Debug.echoError(ex);
+            }
+            return;
+        }
         fire(event);
     }
 }

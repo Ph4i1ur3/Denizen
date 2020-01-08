@@ -30,20 +30,11 @@ public class EntityInvulnerable implements Property {
             "invulnerable"
     };
 
-
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     private EntityInvulnerable(EntityTag entity) {
         dentity = entity;
     }
 
     EntityTag dentity;
-
-    /////////
-    // Property Methods
-    ///////
 
     @Override
     public String getPropertyString() {
@@ -59,10 +50,6 @@ public class EntityInvulnerable implements Property {
     public String getPropertyId() {
         return "invulnerable";
     }
-
-    ///////////
-    // ObjectTag Attributes
-    ////////
 
     @Override
     public ObjectTag getObjectAttribute(Attribute attribute) {
@@ -99,7 +86,6 @@ public class EntityInvulnerable implements Property {
         // @tags
         // <EntityTag.invulnerable>
         // -->
-
         if (mechanism.matches("invulnerable") && mechanism.requireBoolean()) {
             dentity.getBukkitEntity().setInvulnerable(mechanism.getValue().asBoolean());
         }

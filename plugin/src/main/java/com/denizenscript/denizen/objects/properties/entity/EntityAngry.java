@@ -34,20 +34,11 @@ public class EntityAngry implements Property {
             "angry"
     };
 
-
-    ///////////////////
-    // Instance Fields and Methods
-    /////////////
-
     private EntityAngry(EntityTag entity) {
         this.entity = entity;
     }
 
     EntityTag entity;
-
-    /////////
-    // Property Methods
-    ///////
 
     @Override
     public String getPropertyString() {
@@ -74,10 +65,6 @@ public class EntityAngry implements Property {
     public String getPropertyId() {
         return "angry";
     }
-
-    ///////////
-    // ObjectTag Attributes
-    ////////
 
     @Override
     public ObjectTag getObjectAttribute(Attribute attribute) {
@@ -120,7 +107,6 @@ public class EntityAngry implements Property {
         // @tags
         // <EntityTag.angry>
         // -->
-
         if (mechanism.matches("angry") && mechanism.requireBoolean()) {
             if (entity.getBukkitEntityType() == EntityType.WOLF) {
                 ((Wolf) entity.getBukkitEntity()).setAngry(mechanism.getValue().asBoolean());

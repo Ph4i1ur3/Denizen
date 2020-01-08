@@ -32,7 +32,7 @@ public class InventoryScriptContainer extends ScriptContainer {
     // Inventory scripts work with the InventoryTag object, and can be fetched with the Object Fetcher by using the
     // InventoryTag constructor InventoryTag_script_name.
     //
-    // Example: - inventory open d:in@MyInventoryScript
+    // Example: - inventory open d:MyInventoryScript
     //
     // The following is the format for the container.
     //
@@ -42,8 +42,8 @@ public class InventoryScriptContainer extends ScriptContainer {
     //
     // <code>
     // # The name of the script is the same name that you can use to construct a new
-    // # InventoryTag based on this inventory script. For example, an inventory script named 'Super Cool Inventory'
-    // # can be referred to as 'in@Super Cool Inventory'.
+    // # InventoryTag based on this inventory script. For example, an inventory script named 'Super_Cool_Inventory'
+    // # can be referred to as 'Super_Cool_Inventory'.
     // Inventory_Script_Name:
     //
     //   type: inventory
@@ -75,7 +75,7 @@ public class InventoryScriptContainer extends ScriptContainer {
     //   # If the slot is filled with air, it will no longer count as being empty.
     //   # | Most inventory scripts should exclude this key, but it may be useful in some cases.
     //   procedural items:
-    //     - define list li@
+    //     - define list <list[]>
     //     - foreach <server.list_online_players>:
     //       - define item human_skull[skull_skin=<[value].name>]
     //       - define list <[list].include[<[item]>]>
@@ -159,7 +159,7 @@ public class InventoryScriptContainer extends ScriptContainer {
                 }
             }
             if (size == 0) {
-                if (contains("slots") && (getInventoryType().getDefaultSize() % 9) == 0) {
+                if (contains("slots") && getInventoryType().name().equalsIgnoreCase("chest")) {
                     size = getStringList("slots").size() * 9;
                 }
                 else {
@@ -241,7 +241,7 @@ public class InventoryScriptContainer extends ScriptContainer {
                         ListTag list = ListTag.getListFor(queue.determinations.getObject(0));
                         if (list != null) {
                             int x = 0;
-                            for (ItemTag item : list.filter(ItemTag.class, this, true)) {
+                            for (ItemTag item : list.filter(ItemTag.class, context, true)) {
                                 while (x < filledSlots.length && filledSlots[x]) {
                                     x++;
                                 }
