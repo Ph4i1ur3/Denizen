@@ -243,7 +243,7 @@ public class DenizenCommandHandler {
                 Debug.toggle();
             }
             Debug.showSources = !Debug.showSources;
-            Messaging.sendInfo(sender, (NMSHandler.debugPackets ? "Denizen debugger is now showing source information."
+            Messaging.sendInfo(sender, (Debug.showSources ? "Denizen debugger is now showing source information."
                     : "Denizen debugger is no longer showing source information."));
         }
         if (args.hasFlag('p')) {
@@ -251,7 +251,7 @@ public class DenizenCommandHandler {
                 Debug.toggle();
             }
             NMSHandler.debugPackets = !NMSHandler.debugPackets;
-            Messaging.sendInfo(sender, (Debug.showSources ? "Denizen debugger is now showing packet logs."
+            Messaging.sendInfo(sender, (NMSHandler.debugPackets ? "Denizen debugger is now showing packet logs."
                     : "Denizen debugger is no longer showing packet logs."));
         }
         if (args.hasFlag('l')) {
@@ -394,7 +394,6 @@ public class DenizenCommandHandler {
         if (args.hasValueFlag("filter")) {
             filter = args.getFlag("filter");
         }
-        // Get script names from the scripts.yml in memory
         Set<String> scripts = ScriptRegistry.scriptContainers.keySet();
         // New Paginator to display script names
         Paginator paginator = new Paginator().header("Scripts");
