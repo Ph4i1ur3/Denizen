@@ -143,7 +143,7 @@ public class Denizen extends JavaPlugin {
         try {
             versionTag = this.getDescription().getVersion();
 
-            CoreUtilities.noDebugContext = new BukkitTagContext(null, null, false, null, false, null);
+            CoreUtilities.noDebugContext = new BukkitTagContext(null, null, null, false, null);
 
             // Load Denizen's core
             DenizenCore.init(coreImplementation);
@@ -359,7 +359,6 @@ public class Denizen extends JavaPlugin {
             OldEventManager.registerSmartEvent(new CuboidEnterExitSmartEvent());
             OldEventManager.registerSmartEvent(new FlagSmartEvent());
             OldEventManager.registerSmartEvent(new NPCNavigationSmartEvent());
-            eventManager().registerCoreMembers();
 
             // Register all the modern script events
             ScriptEventRegistry.registerMainEvents();

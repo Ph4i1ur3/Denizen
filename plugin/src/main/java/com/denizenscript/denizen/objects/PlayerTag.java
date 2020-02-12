@@ -4,6 +4,7 @@ import com.denizenscript.denizen.nms.interfaces.AdvancementHelper;
 import com.denizenscript.denizen.objects.properties.entity.EntityHealth;
 import com.denizenscript.denizen.scripts.commands.player.SidebarCommand;
 import com.denizenscript.denizen.utilities.DenizenAPI;
+import com.denizenscript.denizen.utilities.FormattedTextHelper;
 import com.denizenscript.denizen.utilities.Utilities;
 import com.denizenscript.denizen.utilities.blocks.FakeBlock;
 import com.denizenscript.denizen.utilities.debugging.Debug;
@@ -30,6 +31,7 @@ import com.denizenscript.denizencore.utilities.CoreUtilities;
 import com.denizenscript.denizencore.utilities.Deprecations;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
+import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
@@ -231,7 +233,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
     //   INSTANCE FIELDS/METHODS
     /////////////////
 
-    OfflinePlayer offlinePlayer = null;
+    OfflinePlayer offlinePlayer;
 
     public boolean isValid() {
         return getPlayerEntity() != null || getOfflinePlayer() != null;
@@ -1742,10 +1744,28 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // @returns ElementTag
         // @description
         // Returns the player's current skin blob.
+        // In the format: "texture;signature" (two values separated by a semicolon).
         // @mechanism PlayerTag.skin_blob
         // -->
         registerOnlineOnlyTag("skin_blob", (attribute, object) -> {
             return new ElementTag(NMSHandler.getInstance().getProfileEditor().getPlayerSkinBlob(object.getPlayerEntity()));
+        });
+
+        // <--[tag]
+        // @attribute <PlayerTag.skull_skin>
+        // @returns ElementTag
+        // @description
+        // Returns the player's current skin blob, formatted for input to a Player Skull item.
+        // In the format: "UUID|Texture|Name" (three values separated by pipes).
+        // See also <@link tag PlayerTag.skin_blob>.
+        // -->
+        registerOnlineOnlyTag("skull_skin", (attribute, object) -> {
+            String skin = NMSHandler.getInstance().getProfileEditor().getPlayerSkinBlob(object.getPlayerEntity());
+            if (skin == null) {
+                return null;
+            }
+            int semicolon = skin.indexOf(';');
+            return new ElementTag(object.getPlayerEntity().getUniqueId() + "|" + skin.substring(0, semicolon) + "|" + object.getName());
         });
 
         // <--[tag]
@@ -2009,7 +2029,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // @returns ElementTag(Number)
         // @mechanism PlayerTag.food_level
         // @description
-        // Returns the current food level of the player.
+        // Returns the current food level (aka hunger) of the player.
         // -->
         registerOnlineOnlyTag("food_level", (attribute, object) -> {
             if (attribute.startsWith("formatted", 2)) {
@@ -3042,22 +3062,22 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // -->
         if (mechanism.matches("hide_entity")) {
             if (!mechanism.getValue().asString().isEmpty()) {
-                String[] split = mechanism.getValue().asString().split("[\\|" + ListTag.internal_escape + "]", 2);
-                if (split.length > 0 && new ElementTag(split[0]).matchesType(EntityTag.class)) {
+                ListTag split = mechanism.valueAsType(ListTag.class);
+                if (split.size() > 0 && new ElementTag(split.get(0)).matchesType(EntityTag.class)) {
                     EntityTag entity = mechanism.valueAsType(EntityTag.class);
                     if (!entity.isSpawnedOrValidForTag()) {
-                        Debug.echoError("Can't hide the unspawned entity '" + split[0] + "'!");
+                        Debug.echoError("Can't hide the unspawned entity '" + split.get(0) + "'!");
                     }
-                    else if (split.length > 1 && new ElementTag(split[1]).isBoolean()) {
+                    else if (split.size() > 1 && new ElementTag(split.get(1)).isBoolean()) {
                         NMSHandler.getEntityHelper().hideEntity(getPlayerEntity(), entity.getBukkitEntity(),
-                                new ElementTag(split[1]).asBoolean());
+                                new ElementTag(split.get(1)).asBoolean());
                     }
                     else {
                         NMSHandler.getEntityHelper().hideEntity(getPlayerEntity(), entity.getBukkitEntity(), false);
                     }
                 }
                 else {
-                    Debug.echoError("'" + split[0] + "' is not a valid entity!");
+                    Debug.echoError("'" + split.get(0) + "' is not a valid entity!");
                 }
             }
             else {
@@ -3080,7 +3100,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // -->
         if (mechanism.matches("show_boss_bar")) {
             if (!mechanism.getValue().asString().isEmpty()) {
-                String[] split = mechanism.getValue().asString().split("[\\|" + ListTag.internal_escape + "]", 2);
+                String[] split = mechanism.getValue().asString().split("\\|", 2);
                 if (split.length == 2 && new ElementTag(split[0]).isDouble()) {
                     BossBarHelper.showSimpleBossBar(getPlayerEntity(), split[1], new ElementTag(split[0]).asDouble() * (1.0 / 200.0));
                 }
@@ -3106,7 +3126,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // -->
         if (mechanism.matches("fake_experience")) {
             if (!mechanism.getValue().asString().isEmpty()) {
-                String[] split = mechanism.getValue().asString().split("[\\|" + ListTag.internal_escape + "]", 2);
+                String[] split = mechanism.getValue().asString().split("\\|", 2);
                 if (split.length > 0 && new ElementTag(split[0]).isFloat()) {
                     if (split.length > 1 && new ElementTag(split[1]).isInt()) {
                         NMSHandler.getPacketHelper().showExperience(getPlayerEntity(),
@@ -3142,7 +3162,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // -->
         if (mechanism.matches("fake_health")) {
             if (!mechanism.getValue().asString().isEmpty()) {
-                String[] split = mechanism.getValue().asString().split("[\\|" + ListTag.internal_escape + "]", 3);
+                String[] split = mechanism.getValue().asString().split("\\|", 3);
                 if (split.length > 0 && new ElementTag(split[0]).isFloat()) {
                     if (split.length > 1 && new ElementTag(split[1]).isInt()) {
                         if (split.length > 2 && new ElementTag(split[2]).isFloat()) {
@@ -3183,7 +3203,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // -->
         if (mechanism.matches("fake_equipment")) {
             if (!mechanism.getValue().asString().isEmpty()) {
-                String[] split = mechanism.getValue().asString().split("[\\|" + ListTag.internal_escape + "]", 3);
+                String[] split = mechanism.getValue().asString().split("\\|", 3);
                 if (split.length > 0 && new ElementTag(split[0]).matchesType(EntityTag.class)) {
                     String slot = split.length > 1 ? split[1].toUpperCase() : null;
                     if (split.length > 1 && (new ElementTag(slot).matchesEnum(EquipmentSlot.values())
@@ -3428,7 +3448,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // -->
         if (mechanism.matches("tab_list_info")) {
             if (!mechanism.getValue().asString().isEmpty()) {
-                String[] split = mechanism.getValue().asString().split("[\\|" + ListTag.internal_escape + "]", 2);
+                String[] split = mechanism.getValue().asString().split("\\|", 2);
                 if (split.length > 0) {
                     String header = split[0];
                     String footer = "";
@@ -3455,7 +3475,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // -->
         if (mechanism.matches("sign_update")) {
             if (!mechanism.getValue().asString().isEmpty()) {
-                String[] split = mechanism.getValue().asString().split("[\\|" + ListTag.internal_escape + "]", 2);
+                String[] split = mechanism.getValue().asString().split("\\|", 2);
                 if (LocationTag.matches(split[0]) && split.length > 1) {
                     ListTag lines = ListTag.valueOf(split[1], mechanism.context);
                     getPlayerEntity().sendSignChange(LocationTag.valueOf(split[0]), lines.toArray(new String[4]));
@@ -3481,7 +3501,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // -->
         if (mechanism.matches("banner_update")) {
             if (mechanism.getValue().asString().length() > 0) {
-                String[] split = mechanism.getValue().asString().split("[\\|" + ListTag.internal_escape + "]");
+                String[] split = mechanism.getValue().asString().split("\\|");
                 List<org.bukkit.block.banner.Pattern> patterns = new ArrayList<>();
                 if (split.length > 2) {
                     List<String> splitList;
@@ -3539,15 +3559,9 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
             }
         }
 
-        // <--[mechanism]
-        // @object PlayerTag
-        // @name action_bar
-        // @input ElementTag
-        // @description
-        // Sends the player text in the action bar.
-        // -->
         if (mechanism.matches("action_bar")) {
-            NMSHandler.getPacketHelper().sendActionBarMessage(getPlayerEntity(), mechanism.getValue().asString());
+            Deprecations.playerActionBarMech.warn(mechanism.context);
+            getPlayerEntity().spigot().sendMessage(ChatMessageType.ACTION_BAR, FormattedTextHelper.parse(mechanism.getValue().asString()));
         }
 
         // <--[mechanism]
@@ -3603,6 +3617,7 @@ public class PlayerTag implements ObjectTag, Adjustable, EntityFormObject {
         // @input ElementTag
         // @description
         // Changes the skin of the player to the specified blob.
+        // In the format: "texture;signature" (two values separated by a semicolon).
         // @tags
         // <PlayerTag.skin_blob>
         // -->

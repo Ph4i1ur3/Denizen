@@ -74,7 +74,6 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
         for (LocationPair pair : pairs) {
             cuboid.pairs.add(new LocationPair(pair.point_1.clone(), pair.point_2.clone()));
         }
-        cuboid.filter = new ArrayList<>(filter);
         return cuboid;
     }
 
@@ -228,7 +227,7 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
         }
 
         public void regenerate() {
-            World world = point_1.getWorld();
+            String world = point_1.getWorldName();
 
             // Find the low and high locations based on the points
             // specified
@@ -248,8 +247,8 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
                     ? point_1.getBlockZ() : point_2.getBlockZ());
 
             // Specify defining locations to the pair
-            low = new LocationTag(world, x_low, y_low, z_low);
-            high = new LocationTag(world, x_high, y_high, z_high);
+            low = new LocationTag(x_low, y_low, z_low, world);
+            high = new LocationTag(x_high, y_high, z_high, world);
             generateDistances();
         }
 
@@ -267,9 +266,6 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
     // Location Pairs (low, high) that make up the CuboidTag
     public List<LocationPair> pairs = new ArrayList<>();
 
-    // Only put MaterialTags in filter.
-    ArrayList<ObjectTag> filter = new ArrayList<>();
-
     /**
      * Construct the cuboid without adding pairs
      * ONLY use this if addPair will be called immediately after!
@@ -278,10 +274,10 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
     }
 
     public CuboidTag(Location point_1, Location point_2) {
-        addPair(point_1, point_2);
+        addPair(new LocationTag(point_1), new LocationTag(point_2));
     }
 
-    public void addPair(Location point_1, Location point_2) {
+    public void addPair(LocationTag point_1, LocationTag point_2) {
         if (point_1.getWorld() != point_2.getWorld()) {
             Debug.echoError("Tried to make cross-world cuboid!");
             return;
@@ -291,7 +287,7 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
             return;
         }
         // Make a new pair
-        LocationPair pair = new LocationPair(new LocationTag(point_1), new LocationTag(point_2));
+        LocationPair pair = new LocationPair(point_1, point_2);
         // Add it to the Cuboid pairs list
         pairs.add(pair);
     }
@@ -318,27 +314,6 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
 
         // Does not match any of the pairs
         return false;
-    }
-
-    public CuboidTag addBlocksToFilter(List<MaterialTag> addl) {
-        filter.addAll(addl);
-        return this;
-    }
-
-    public CuboidTag removeBlocksFromFilter(List<MaterialTag> addl) {
-        filter.removeAll(addl);
-        return this;
-    }
-
-    public CuboidTag removeFilter() {
-        filter.clear();
-        return this;
-    }
-
-    public CuboidTag setAsFilter(List<MaterialTag> list) {
-        filter.clear();
-        filter.addAll(list);
-        return this;
     }
 
     public ListTag getShell() {
@@ -517,7 +492,7 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
     }
 
     public List<LocationTag> getBlocks_internal(List<MaterialTag> materials, Attribute attribute) {
-        if (materials == null && filter.isEmpty()) {
+        if (materials == null) {
             return getBlockLocationsUnfiltered();
         }
         int max = Settings.blockTagsMaxBlocks();
@@ -539,20 +514,8 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
                         if (loc.getY() < 0 || loc.getY() > 255) {
                             continue;
                         }
-                        if (!filter.isEmpty()) { // TODO: Should 'filter' exist?
-                            // Check filter
-                            for (ObjectTag material : filter) {
-                                if (((MaterialTag) material).matchesBlock(loc.getBlockForTag(attribute))) {
-                                    if (matchesMaterialList(loc, materials, attribute)) {
-                                        list.add(loc);
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            if (matchesMaterialList(loc, materials, attribute)) {
-                                list.add(loc);
-                            }
+                        if (matchesMaterialList(loc, materials, attribute)) {
+                            list.add(loc);
                         }
                         index++;
                         if (index > max) {
@@ -647,7 +610,7 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
     }
 
     public World getWorld() {
-        if (pairs.size() == 0) {
+        if (pairs.isEmpty()) {
             return null;
         }
         return pairs.get(0).high.getWorld();
@@ -830,16 +793,6 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
         registerTag("outline", (attribute, cuboid) -> {
             return cuboid.getOutline();
         }, "get_outline");
-
-        // <--[tag]
-        // @attribute <CuboidTag.filter>
-        // @returns ListTag(LocationTag)
-        // @description
-        // Returns the block locations from the CuboidTag's filter.
-        // -->
-        registerTag("filter", (attribute, cuboid) -> {
-            return new ListTag(cuboid.filter);
-        });
 
         // <--[tag]
         // @attribute <CuboidTag.intersects[<cuboid>]>
@@ -1420,6 +1373,7 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
         // @returns ListTag(EntityTag)
         // @description
         // Gets a list of all living entities currently within the CuboidTag.
+        // This includes Players, mobs, NPCs, etc., but excludes dropped items, experience orbs, etc.
         // -->
         registerTag("list_living_entities", (attribute, cuboid) -> {
             ArrayList<EntityTag> entities = new ArrayList<>();

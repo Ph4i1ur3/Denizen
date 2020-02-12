@@ -187,7 +187,7 @@ public class MaterialTag implements ObjectTag, Adjustable {
         return null;
     }
 
-    public static TagContext noDebugContext = new BukkitTagContext(null, null, false, null, false, null);
+    public static TagContext noDebugContext = new BukkitTagContext(null, null, null, false, null);
 
     /**
      * Determine whether a string is a valid material.
@@ -966,7 +966,7 @@ public class MaterialTag implements ObjectTag, Adjustable {
                     Debug.echoError("Invalid property string '" + properties.get(i) + "'!");
                 }
                 else {
-                    mat.safeApplyProperty(new Mechanism(new ElementTag(data.get(0)), new ElementTag((data.get(1)).replace((char) 0x2011, ';')), attribute.context));
+                    mat.safeApplyProperty(new Mechanism(new ElementTag(data.get(0)), new ElementTag(data.get(1)), attribute.context));
                 }
             }
             return mat;

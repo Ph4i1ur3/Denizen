@@ -85,7 +85,7 @@ public class AnnounceCommand extends AbstractCommand {
             }
             else if (!scriptEntry.hasObject("format")
                     && arg.matchesPrefix("format")) {
-                FormatScriptContainer format = null;
+                FormatScriptContainer format;
                 String formatStr = arg.getValue();
                 format = ScriptRegistry.getScriptContainer(formatStr);
                 if (format == null) {
@@ -110,13 +110,11 @@ public class AnnounceCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptEntry scriptEntry) {
-        // Fetch objects
         ElementTag text = scriptEntry.getElement("text");
         AnnounceType type = (AnnounceType) scriptEntry.getObject("type");
         FormatScriptContainer format = (FormatScriptContainer) scriptEntry.getObject("format");
         ElementTag flag = scriptEntry.getElement("flag");
 
-        // Report to dB
         if (scriptEntry.dbCallShouldDebug()) {
             Debug.report(scriptEntry, getName(),
                     ArgumentHelper.debugObj("Message", text)

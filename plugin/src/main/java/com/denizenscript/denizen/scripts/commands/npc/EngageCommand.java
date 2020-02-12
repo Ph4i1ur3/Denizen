@@ -41,7 +41,7 @@ public class EngageCommand extends AbstractCommand {
     // See <@link command Disengage>
     //
     // @Tags
-    // <NPCTag.is_engaged>
+    // <NPCTag.engaged>
     //
     // @Usage
     // Use to make an NPC appear 'busy'.
@@ -92,7 +92,6 @@ public class EngageCommand extends AbstractCommand {
         DurationTag duration = scriptEntry.getObjectTag("duration");
         NPCTag npc = Utilities.getEntryNPC(scriptEntry);
 
-        // Report to dB
         if (scriptEntry.dbCallShouldDebug()) {
             Debug.report(scriptEntry, getName(), npc.debug() + duration.debug());
         }

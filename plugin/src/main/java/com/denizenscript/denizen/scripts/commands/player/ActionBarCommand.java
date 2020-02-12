@@ -1,10 +1,9 @@
 package com.denizenscript.denizen.scripts.commands.player;
 
 import com.denizenscript.denizen.scripts.containers.core.FormatScriptContainer;
+import com.denizenscript.denizen.utilities.FormattedTextHelper;
 import com.denizenscript.denizen.utilities.Utilities;
 import com.denizenscript.denizen.utilities.debugging.Debug;
-import com.denizenscript.denizen.utilities.implementation.BukkitScriptEntryData;
-import com.denizenscript.denizen.nms.NMSHandler;
 import com.denizenscript.denizen.objects.PlayerTag;
 import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.Argument;
@@ -15,6 +14,7 @@ import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.ScriptRegistry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
 import com.denizenscript.denizencore.tags.TagManager;
+import net.md_5.bungee.api.ChatMessageType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -67,7 +67,7 @@ public class ActionBarCommand extends AbstractCommand {
                 scriptEntry.addObject("targets", arg.asType(ListTag.class).filter(PlayerTag.class, scriptEntry));
             }
             else if (!scriptEntry.hasObject("text")) {
-                scriptEntry.addObject("text", new ElementTag(TagManager.cleanOutputFully(arg.raw_value)));
+                scriptEntry.addObject("text", new ElementTag(arg.raw_value));
             }
         }
 
@@ -80,37 +80,29 @@ public class ActionBarCommand extends AbstractCommand {
         }
 
         if (!scriptEntry.hasObject("targets")) {
-            BukkitScriptEntryData data = (BukkitScriptEntryData) scriptEntry.entryData;
-            if (!data.hasPlayer()) {
+            if (!Utilities.entryHasPlayer(scriptEntry)) {
                 throw new InvalidArgumentsException("Must specify valid player Targets!");
             }
             else {
-                scriptEntry.addObject("targets",
-                        Arrays.asList(data.getPlayer()));
+                scriptEntry.addObject("targets", Arrays.asList(Utilities.getEntryPlayer(scriptEntry)));
             }
         }
     }
 
     @Override
     public void execute(ScriptEntry scriptEntry) {
-
         ElementTag text = scriptEntry.getElement("text");
         FormatScriptContainer format = (FormatScriptContainer) scriptEntry.getObject("format");
-
         List<PlayerTag> targets = (List<PlayerTag>) scriptEntry.getObject("targets");
-
         if (scriptEntry.dbCallShouldDebug()) {
-
             Debug.report(scriptEntry, getName(), text.debug() + ArgumentHelper.debugList("Targets", targets));
-
         }
         if (format != null) {
             text = new ElementTag(format.getFormattedText(text.asString(), scriptEntry));
         }
-
         for (PlayerTag player : targets) {
             if (player.isValid() && player.isOnline()) {
-                NMSHandler.getPacketHelper().sendActionBarMessage(player.getPlayerEntity(), text.asString());
+                player.getPlayerEntity().spigot().sendMessage(ChatMessageType.ACTION_BAR, FormattedTextHelper.parse(text.asString()));
             }
             else {
                 Debug.echoError(scriptEntry.getResidingQueue(), "Tried to send action bar message to non-existent or offline player!");

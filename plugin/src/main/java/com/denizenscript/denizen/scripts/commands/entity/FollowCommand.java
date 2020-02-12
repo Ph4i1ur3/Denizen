@@ -58,7 +58,7 @@ public class FollowCommand extends AbstractCommand {
         // Parse Arguments
         for (Argument arg : scriptEntry.getProcessedArgs()) {
             if (!scriptEntry.hasObject("stop") &&
-                    arg.matches("STOP")) {
+                    arg.matches("stop")) {
                 scriptEntry.addObject("stop", new ElementTag(true));
             }
             else if (!scriptEntry.hasObject("lead") &&
@@ -116,7 +116,6 @@ public class FollowCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptEntry scriptEntry) {
-        // Get objects
         ElementTag stop = scriptEntry.getElement("stop");
         ElementTag lead = scriptEntry.getElement("lead");
         ElementTag maxRange = scriptEntry.getElement("max");
@@ -125,7 +124,6 @@ public class FollowCommand extends AbstractCommand {
         ListTag entities = scriptEntry.getObjectTag("entities");
         EntityTag target = scriptEntry.getObjectTag("target");
 
-        // Report to dB
         if (scriptEntry.dbCallShouldDebug()) {
             Debug.report(scriptEntry, getName(),
                     (Utilities.getEntryPlayer(scriptEntry) != null ? Utilities.getEntryPlayer(scriptEntry).debug() : "")

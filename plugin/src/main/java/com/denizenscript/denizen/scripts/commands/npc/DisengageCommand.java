@@ -31,7 +31,7 @@ public class DisengageCommand extends AbstractCommand {
     // See <@link command Engage>
     //
     // @Tags
-    // <NPCTag.is_engaged>
+    // <NPCTag.engaged>
     //
     // @Usage
     // Use to reenable an NPC's triggers, disabled via 'engage'.
@@ -56,7 +56,6 @@ public class DisengageCommand extends AbstractCommand {
     @Override
     public void execute(ScriptEntry scriptEntry) {
 
-        // Report to dB
         if (scriptEntry.dbCallShouldDebug()) {
             Debug.report(scriptEntry, getName(),
                     Utilities.getEntryNPC(scriptEntry).debug());

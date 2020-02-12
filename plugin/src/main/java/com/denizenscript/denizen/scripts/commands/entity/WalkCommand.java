@@ -87,8 +87,6 @@ public class WalkCommand extends AbstractCommand implements Holdable {
     @Override
     public void parseArgs(ScriptEntry scriptEntry) throws InvalidArgumentsException {
 
-        // Interpret arguments
-
         for (Argument arg : scriptEntry.getProcessedArgs()) {
 
             if (!scriptEntry.hasObject("lookat")
@@ -98,7 +96,7 @@ public class WalkCommand extends AbstractCommand implements Holdable {
             }
             else if (!scriptEntry.hasObject("speed")
                     && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Percentage)
-                    && arg.matchesPrefix("s, speed")) {
+                    && arg.matchesPrefix("s", "speed")) {
                 scriptEntry.addObject("speed", arg.asElement());
             }
             else if (!scriptEntry.hasObject("auto_range")
@@ -127,8 +125,6 @@ public class WalkCommand extends AbstractCommand implements Holdable {
             }
         }
 
-        // Check for required information
-
         if (!scriptEntry.hasObject("location") && !scriptEntry.hasObject("stop")) {
             throw new InvalidArgumentsException("Must specify a location!");
         }
@@ -151,8 +147,6 @@ public class WalkCommand extends AbstractCommand implements Holdable {
     @Override
     public void execute(ScriptEntry scriptEntry) {
 
-        // Fetch required objects
-
         LocationTag loc = (LocationTag) scriptEntry.getObject("location");
         ElementTag speed = scriptEntry.getElement("speed");
         ElementTag auto_range = scriptEntry.getElement("auto_range");
@@ -161,10 +155,7 @@ public class WalkCommand extends AbstractCommand implements Holdable {
         List<EntityTag> entities = (List<EntityTag>) scriptEntry.getObject("entities");
         final LocationTag lookat = scriptEntry.getObjectTag("lookat");
 
-        // Debug the execution
-
         if (scriptEntry.dbCallShouldDebug()) {
-
             Debug.report(scriptEntry, getName(), (loc != null ? loc.debug() : "")
                     + (speed != null ? speed.debug() : "")
                     + (auto_range != null ? auto_range.debug() : "")
@@ -172,7 +163,6 @@ public class WalkCommand extends AbstractCommand implements Holdable {
                     + (lookat != null ? lookat.debug() : "")
                     + stop.debug()
                     + (ArgumentHelper.debugObj("entities", entities)));
-
         }
 
         // Do the execution

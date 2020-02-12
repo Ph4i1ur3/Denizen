@@ -375,10 +375,11 @@ public class ChunkTag implements ObjectTag, Adjustable {
         });
 
         // <--[tag]
-        // @attribute <ChunkTag.entities>
+        // @attribute <ChunkTag.entities[<entity>|...]>
         // @returns ListTag(EntityTag)
         // @description
         // Returns a list of entities in the chunk.
+        // Optionally specify entity types to filter down to.
         // -->
         registerTag("entities", (attribute, object) -> {
             ListTag entities = new ListTag();
@@ -386,10 +387,22 @@ public class ChunkTag implements ObjectTag, Adjustable {
             if (chunk == null) {
                 return null;
             }
+            ListTag typeFilter = attribute.hasContext(1) ? ListTag.valueOf(attribute.getContext(1), attribute.context) : null;
             try {
                 NMSHandler.getChunkHelper().changeChunkServerThread(object.getWorld());
-                for (Entity ent : chunk.getEntities()) {
-                    entities.addObject(new EntityTag(ent).getDenizenObject());
+                for (Entity entity : chunk.getEntities()) {
+                    EntityTag current = new EntityTag(entity);
+                    if (typeFilter != null) {
+                        for (String type : typeFilter) {
+                            if (current.comparedTo(type)) {
+                                entities.addObject(current.getDenizenObject());
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        entities.addObject(current.getDenizenObject());
+                    }
                 }
             }
             finally {
@@ -402,8 +415,8 @@ public class ChunkTag implements ObjectTag, Adjustable {
         // @attribute <ChunkTag.living_entities>
         // @returns ListTag(EntityTag)
         // @description
-        // Returns a list of living entities in the chunk. This includes Players, mobs, NPCs, etc., but excludes
-        // dropped items, experience orbs, etc.
+        // Returns a list of living entities in the chunk.
+        // This includes Players, mobs, NPCs, etc., but excludes dropped items, experience orbs, etc.
         // -->
         registerTag("living_entities", (attribute, object) -> {
             ListTag entities = new ListTag();

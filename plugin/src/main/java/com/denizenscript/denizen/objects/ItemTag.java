@@ -93,11 +93,11 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
     }
 
     public static ItemTag valueOf(String string, Debuggable debugMe) {
-        return valueOf(string, new BukkitTagContext(null, null, false, null, debugMe == null || debugMe.shouldDebug(), null));
+        return valueOf(string, new BukkitTagContext(null, null, null, debugMe == null || debugMe.shouldDebug(), null));
     }
 
     public static ItemTag valueOf(String string, boolean debugMe) {
-        return valueOf(string, new BukkitTagContext(null, null, false, null, debugMe, null));
+        return valueOf(string, new BukkitTagContext(null, null, null, debugMe, null));
     }
 
     @Fetchable("i")
@@ -664,7 +664,7 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
                     Debug.echoError("Invalid property string '" + properties.get(i) + "'!");
                 }
                 else {
-                    item.safeApplyProperty(new Mechanism(new ElementTag(data.get(0)), new ElementTag((data.get(1)).replace((char) 0x2011, ';')), attribute.context));
+                    item.safeApplyProperty(new Mechanism(new ElementTag(data.get(0)), new ElementTag(data.get(1)), attribute.context));
                 }
             }
             return item;

@@ -33,11 +33,10 @@ public class DenizenCoreImplementation implements DenizenImplementation {
 
     @Override
     public File getScriptFolder() {
-        File file = null;
+        File file;
         // Get the script directory
         if (Settings.useDefaultScriptPath()) {
-            file = new File(DenizenAPI.getCurrentInstance()
-                    .getDataFolder() + File.separator + "scripts");
+            file = new File(DenizenAPI.getCurrentInstance().getDataFolder() + File.separator + "scripts");
         }
         else {
             file = new File(Settings.getAlternateScriptPath().replace("/", File.separator));
@@ -159,11 +158,6 @@ public class DenizenCoreImplementation implements DenizenImplementation {
     }
 
     @Override
-    public TagContext getTagContextFor(ScriptEntry scriptEntry, boolean instant) {
-        return new BukkitTagContext(scriptEntry, instant);
-    }
-
-    @Override
     public boolean needsHandleArgPrefix(String prefix) {
         return prefix.equals("player") || prefix.equals("npc") || prefix.equals("npcid");
     }
@@ -198,7 +192,7 @@ public class DenizenCoreImplementation implements DenizenImplementation {
         // Fill player/off-line player
         if (arg.matchesPrefix("player") && !if_ignore) {
             Debug.echoDebug(scriptEntry, "...replacing the linked player with " + arg.getValue());
-            String value = TagManager.tag(arg.getValue(), new BukkitTagContext(scriptEntry, false));
+            String value = TagManager.tag(arg.getValue(), new BukkitTagContext(scriptEntry));
             PlayerTag player = PlayerTag.valueOf(value);
             if (player == null || !player.isValid()) {
                 Debug.echoError(scriptEntry.getResidingQueue(), value + " is an invalid player!");
@@ -207,10 +201,10 @@ public class DenizenCoreImplementation implements DenizenImplementation {
             return true;
         }
 
-        // Fill NPCID/NPC argument
-        else if (arg.matchesPrefix("npc, npcid") && !if_ignore) {
+        // Fill NPC argument
+        else if (arg.matchesPrefix("npc") && !if_ignore) {
             Debug.echoDebug(scriptEntry, "...replacing the linked NPC with " + arg.getValue());
-            String value = TagManager.tag(arg.getValue(), new BukkitTagContext(scriptEntry, false));
+            String value = TagManager.tag(arg.getValue(), new BukkitTagContext(scriptEntry));
             NPCTag npc = NPCTag.valueOf(value);
             if (npc == null || !npc.isValid()) {
                 Debug.echoError(scriptEntry.getResidingQueue(), value + " is an invalid NPC!");
@@ -263,17 +257,8 @@ public class DenizenCoreImplementation implements DenizenImplementation {
     }
 
     @Override
-    public String getLastEntryFromFlag(String flag) {
-        FlagManager.Flag theflag = DenizenAPI.getCurrentInstance().getFlag(flag);
-        if (theflag == null || theflag.getLast() == null) {
-            return null;
-        }
-        return theflag.getLast().asString();
-    }
-
-    @Override
     public TagContext getTagContext(ScriptEntry scriptEntry) {
-        return new BukkitTagContext(scriptEntry, false);
+        return new BukkitTagContext(scriptEntry);
     }
 
     @Override

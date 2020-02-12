@@ -54,7 +54,7 @@ public class TextTagBase {
                 }
                 else if (lower.equals("&sc")) {
                     Deprecations.pointlessTextTags.warn(event.getScriptEntry());
-                    event.setReplaced(new ElementTag(String.valueOf((char) 0x2011)).getAttribute(attribute.fulfill(1)));
+                    event.setReplaced(new ElementTag(";").getAttribute(attribute.fulfill(1)));
                 }
                 else if (lower.equals("&pipe")) {
                     Deprecations.pointlessTextTags.warn(event.getScriptEntry());
@@ -257,7 +257,7 @@ public class TextTagBase {
         TagManager.registerTagHandler(new TagRunnable.RootForm() {
             @Override
             public void run(ReplaceableTagEvent event) {
-                event.setReplaced(new ElementTag(String.valueOf((char) 0x01)).getAttribute(event.getAttributes().fulfill(1)));
+                event.setReplaced(new ElementTag("<").getAttribute(event.getAttributes().fulfill(1)));
             }
         }, "&lt");
 
@@ -270,7 +270,7 @@ public class TextTagBase {
         TagManager.registerTagHandler(new TagRunnable.RootForm() {
             @Override
             public void run(ReplaceableTagEvent event) {
-                event.setReplaced(new ElementTag(String.valueOf((char) 0x02)).getAttribute(event.getAttributes().fulfill(1)));
+                event.setReplaced(new ElementTag(">").getAttribute(event.getAttributes().fulfill(1)));
             }
         }, "&gt");
 
@@ -364,9 +364,11 @@ public class TextTagBase {
         // @attribute <&click[<click command>]>
         // @returns ElementTag
         // @description
-        // Returns a special chat code that makes the following text execute the input command when clicked.
+        // Returns a special chat code that makes the following text execute the input command line value when clicked.
+        // To execute a command "/" should be used at the start. Otherwise, it will display as chat.
         // This tag must be followed by an <&end_click> tag.
-        // For example: - narrate "You can <&click[say wow]>click here<&end_click> to say wow!"
+        // For example: - narrate "You can <&click[wow]>click here<&end_click> to say wow!"
+        // For example: - narrate "You can <&click[/help]>click here<&end_click> to for help!"
         // -->
         TagManager.registerTagHandler(new TagRunnable.RootForm() {
             @Override
@@ -381,7 +383,7 @@ public class TextTagBase {
                 // Returns a special chat code that makes the following text execute the input command when clicked.
                 // This tag must be followed by an <&end_click> tag.
                 // Optionally specify the hover type as one of: OPEN_URL, OPEN_FILE, RUN_COMMAND, SUGGEST_COMMAND, or CHANGE_PAGE.
-                // For example: - narrate "You can <&click[say wow].type[RUN_COMMAND]>click here<&end_click> to say wow!"
+                // For example: - narrate "You can <&click[https://denizenscript.com].type[OPEN_URL]>click here<&end_click> to learn about Denizen!"
                 // -->
                 String type = "RUN_COMMAND";
                 if (attribute.startsWith("type", 2)) {
