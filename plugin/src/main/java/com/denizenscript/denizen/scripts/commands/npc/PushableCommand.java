@@ -8,7 +8,6 @@ import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.core.DurationTag;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.ArgumentHelper;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
 
@@ -55,7 +54,7 @@ public class PushableCommand extends AbstractCommand {
             }
             else if (!scriptEntry.hasObject("return")
                     && arg.matchesPrefix("return", "r")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Boolean)) {
+                    && arg.matchesBoolean()) {
                 scriptEntry.addObject("return", arg.asElement());
             }
 

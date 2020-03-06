@@ -43,7 +43,6 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.*;
-import java.util.regex.Matcher;
 
 public class InventoryTag implements ObjectTag, Notable, Adjustable {
 
@@ -56,21 +55,11 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
     // Inventories can be generically designed using inventory script containers,
     // and can be modified using the inventory command.
     //
-    // For format info, see <@link language in@>
-    //
-    // -->
-
-    // <--[language]
-    // @name in@
-    // @group Object Fetcher System
-    // @description
-    // in@ refers to the 'object identifier' of an InventoryTag. The 'in@' is notation for Denizen's Object
-    // Fetcher. The constructor for an InventoryTag is a the classification type of inventory to use. All other data is specified through properties.
+    // These use the object notation "in@".
+    // The identity format for inventories is a the classification type of inventory to use. All other data is specified through properties.
     //
     // Valid inventory type classifications:
     // "npc", "player", "crafting", "enderchest", "workbench", "entity", "location", "generic"
-    //
-    // For general info, see <@link language InventoryTag Objects>
     //
     // -->
 
@@ -306,8 +295,7 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
 
         ///////
         // Handle objects with properties through the object fetcher
-        Matcher describedMatcher = ObjectFetcher.DESCRIBED_PATTERN.matcher(string);
-        if (describedMatcher.matches()) {
+        if (ObjectFetcher.isObjectWithProperties(string)) {
             InventoryTag result = ObjectFetcher.getObjectFrom(InventoryTag.class, string,
                     new BukkitTagContext(player, npc, null, false, null));
             if (result != null && result.uniquifier != null) {
@@ -1517,13 +1505,10 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
         // Returns a copy of the InventoryTag with items added.
         // -->
         registerTag("include", (attribute, object) -> {
-            if (!attribute.hasContext(1) || !ItemTag.matches(attribute.getContext(1))) {
+            if (!attribute.hasContext(1)) {
                 return null;
             }
             List<ItemTag> items = ListTag.getListFor(attribute.getContextObject(1), attribute.context).filter(ItemTag.class, attribute.context);
-            if (items.isEmpty()) {
-                return null;
-            }
             InventoryTag dummyInv = new InventoryTag(Bukkit.createInventory(null, object.inventory.getType(), NMSHandler.getInstance().getTitle(object.inventory)));
             if (object.inventory.getType() == InventoryType.CHEST) {
                 dummyInv.setSize(object.inventory.getSize());
@@ -1546,6 +1531,43 @@ public class InventoryTag implements ObjectTag, Notable, Adjustable {
             }
             for (ItemTag item: items) {
                 dummyInv.add(0, item.getItemStack());
+            }
+            return dummyInv;
+        });
+
+        // <--[tag]
+        // @attribute <InventoryTag.exclude[<item>|...]>
+        // @returns InventoryTag
+        // @description
+        // Returns a copy of the InventoryTag with items excluded.
+        // -->
+        registerTag("exclude", (attribute, object) -> {
+            if (!attribute.hasContext(1)) {
+                return null;
+            }
+            List<ItemTag> items = ListTag.getListFor(attribute.getContextObject(1), attribute.context).filter(ItemTag.class, attribute.context);
+            InventoryTag dummyInv = new InventoryTag(Bukkit.createInventory(null, object.inventory.getType(), NMSHandler.getInstance().getTitle(object.inventory)));
+            if (object.inventory.getType() == InventoryType.CHEST) {
+                dummyInv.setSize(object.inventory.getSize());
+            }
+            dummyInv.setContents(object.getContents());
+
+            // <--[tag]
+            // @attribute <InventoryTag.exclude[<item>].quantity[<#>]>
+            // @returns InventoryTag
+            // @description
+            // Returns the InventoryTag with a certain quantity of an item excluded.
+            // -->
+            if ((attribute.startsWith("quantity", 2) || attribute.startsWith("qty", 2)) && attribute.hasContext(2)) {
+                if (attribute.startsWith("qty", 2)) {
+                    Deprecations.qtyTags.warn(attribute.context);
+                }
+                int qty = attribute.getIntContext(2);
+                items.get(0).setAmount(qty);
+                attribute.fulfill(1);
+            }
+            for (ItemTag item : items) {
+                dummyInv.inventory.removeItem(item.getItemStack().clone());
             }
             return dummyInv;
         });

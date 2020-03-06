@@ -6,7 +6,6 @@ import com.denizenscript.denizen.objects.PlayerTag;
 import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.ArgumentHelper;
 import com.denizenscript.denizencore.objects.core.ListTag;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
@@ -80,7 +79,7 @@ public class BossBarCommand extends AbstractCommand {
             }
             else if (!scriptEntry.hasObject("progress")
                     && arg.matchesPrefix("progress", "health", "p", "h")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Double)) {
+                    && arg.matchesFloat()) {
                 scriptEntry.addObject("progress", arg.asElement());
             }
             else if (!scriptEntry.hasObject("color")

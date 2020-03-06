@@ -9,7 +9,6 @@ import com.denizenscript.denizen.objects.NPCTag;
 import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.ArgumentHelper;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
@@ -69,7 +68,7 @@ public class BreakCommand extends AbstractCommand implements Holdable {
                 scriptEntry.addObject("npc", arg.asType(NPCTag.class));
             }
             else if (!scriptEntry.hasObject("radius")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Double)) {
+                    && arg.matchesFloat()) {
                 scriptEntry.addObject("radius", arg.asElement());
             }
             else {

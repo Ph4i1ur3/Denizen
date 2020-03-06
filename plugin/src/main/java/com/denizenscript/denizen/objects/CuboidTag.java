@@ -42,20 +42,10 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
     // One 'cuboid' consists of two points: the low point and a high point.
     // a CuboidTag can contain as many cuboids within itself as needed (this allows forming more complex shapes from a single CuboidTag).
     //
-    // For format info, see <@link language cu@>
-    //
-    // -->
-
-    // <--[language]
-    // @name cu@
-    // @group Object Fetcher System
-    // @description
-    // cu@ refers to the 'object identifier' of a CuboidTag. The 'cu@' is notation for Denizen's Object
-    // Fetcher. The constructor for a CuboidTag is <world>,<x1>,<y1>,<z1>,<x2>,<y2>,<z2>
+    // These use the object notation "cu@".
+    // The identity format for cuboids is <world>,<x1>,<y1>,<z1>,<x2>,<y2>,<z2>
     // Multi-member cuboids can simply continue listing x,y,z pairs.
     // For example, 'cu@space,1,2,3,4,5,6'.
-    //
-    // For general info, see <@link language CuboidTag Objects>
     //
     // -->
 
@@ -108,7 +98,7 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
         if (CoreUtilities.toLowerCase(string).startsWith("cu@")) {
             string = string.substring("cu@".length());
         }
-        if (string.contains("|")) {
+        if (CoreUtilities.contains(string, '|')) {
             ListTag positions = ListTag.valueOf(string, context);
             if (positions.size() > 1
                     && LocationTag.matches(positions.get(0))
@@ -142,7 +132,7 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
                 }
             }
         }
-        else if (string.contains(",")) {
+        else if (CoreUtilities.contains(string, ',')) {
             List<String> subStrs = CoreUtilities.split(string, ',');
             if (subStrs.size() < 7 || (subStrs.size() - 1) % 6 != 0) {
                 if (context == null || context.debug) {
@@ -213,16 +203,6 @@ public class CuboidTag implements ObjectTag, Cloneable, Notable, Adjustable {
         public LocationPair(LocationTag point_1, LocationTag point_2) {
             this.point_1 = point_1;
             this.point_2 = point_2;
-            regenerate();
-        }
-
-        public void changePoint(int number, LocationTag point) {
-            if (number == 1) {
-                this.point_1 = point;
-            }
-            else if (number == 2) {
-                this.point_2 = point;
-            }
             regenerate();
         }
 

@@ -8,7 +8,6 @@ import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.core.DurationTag;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.ArgumentHelper;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
 
@@ -54,7 +53,7 @@ public class LightCommand extends AbstractCommand {
                 scriptEntry.addObject("location", arg.asType(LocationTag.class));
             }
             else if (!scriptEntry.hasObject("light")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Integer)) {
+                    && arg.matchesInteger()) {
                 scriptEntry.addObject("light", arg.asElement());
             }
             else if (!scriptEntry.hasObject("reset")

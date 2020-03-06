@@ -58,23 +58,13 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
     // ItemTags do NOT remember where they came from. If you read an item from an inventory, changing it
     // does not change the original item in the original inventory. You must set it back in.
     //
-    // For format info, see <@link language i@>
-    //
-    // -->
-
-    // <--[language]
-    // @name i@
-    // @group Object Fetcher System
-    // @description
-    // i@ refers to the 'object identifier' of an ItemTag. The 'i@' is notation for Denizen's Object
-    // Fetcher. The constructor for an ItemTag is the basic material type name, or an item script name. Other data is specified in properties.
+    // These use the object notation "i@".
+    // The identity format for items is the basic material type name, or an item script name. Other data is specified in properties.
     // For example, 'i@stick'.
     //
     // Find a list of valid materials at:
     // <@link url https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html>
     // Note that some materials on that list are exclusively for use with blocks, and cannot be held as items.
-    //
-    // For general info, see <@link language ItemTag Objects>
     //
     // -->
 
@@ -108,12 +98,13 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
 
         ItemTag stack = null;
 
-        if (ObjectFetcher.DESCRIBED_PATTERN.matcher(string).matches()) {
+        if (ObjectFetcher.isObjectWithProperties(string)) {
             return ObjectFetcher.getObjectFrom(ItemTag.class, string, context);
         }
 
         Notable noted = NotableManager.getSavedObject(string);
         if (noted instanceof ItemTag) {
+            Deprecations.notableItems.warn();
             return (ItemTag) noted;
         }
         if (string.startsWith("i@")) {
@@ -559,6 +550,7 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
 
         // If saved item, return that
         if (isUnique()) {
+            Deprecations.notableItems.warn();
             return "i@" + NotableManager.getSavedId(this) + PropertyParser.getPropertiesString(this);
         }
 
@@ -579,6 +571,7 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
 
             // If saved item, return that
             if (isUnique()) {
+                Deprecations.notableItems.warn();
                 return "i@" + NotableManager.getSavedId(this);
             }
 
@@ -614,7 +607,11 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
 
     @Override
     public boolean isUnique() {
-        return NotableManager.isSaved(this);
+        if (NotableManager.isSaved(this)) {
+            Deprecations.notableItems.warn();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -625,11 +622,13 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
 
     @Override
     public void makeUnique(String id) {
+        Deprecations.notableItems.warn();
         NotableManager.saveAs(this, id);
     }
 
     @Override
     public void forget() {
+        Deprecations.notableItems.warn();
         NotableManager.remove(this);
     }
 
@@ -870,14 +869,8 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
             return list;
         });
 
-        // <--[tag]
-        // @attribute <ItemTag.notable_name>
-        // @returns ElementTag
-        // @description
-        // Gets the name of a Notable ItemTag. If the item isn't noted,
-        // this is null.
-        // -->
         registerTag("notable_name", (attribute, object) -> {
+            Deprecations.notableItems.warn();
             String notname = NotableManager.getSavedId(object);
             if (notname == null) {
                 return null;
@@ -983,6 +976,7 @@ public class ItemTag implements ObjectTag, Notable, Adjustable {
 
     public void applyProperty(Mechanism mechanism) {
         if (NotableManager.isExactSavedObject(this)) {
+            Deprecations.notableItems.warn();
             Debug.echoError("Cannot apply properties to noted objects.");
             return;
         }

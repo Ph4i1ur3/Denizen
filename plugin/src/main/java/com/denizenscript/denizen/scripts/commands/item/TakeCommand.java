@@ -23,7 +23,7 @@ public class TakeCommand extends AbstractCommand {
 
     // <--[command]
     // @Name Take
-    // @Syntax take [money/iteminhand/scriptname:<name>/bydisplay:<name>/bycover:<title>|<author>/slot:<slot>/nbt:<key>/<item>|...] (quantity:<#>) (from:<inventory>)
+    // @Syntax take [money/xp/iteminhand/scriptname:<name>/bydisplay:<name>/bycover:<title>|<author>/slot:<slot>/nbt:<key>/<item>|...] (quantity:<#>) (from:<inventory>)
     // @Required 1
     // @Short Takes an item from the player.
     // @Group item
@@ -44,6 +44,8 @@ public class TakeCommand extends AbstractCommand {
     // Using 'bydisplay:' will take items with the specified display name.
     //
     // Using 'bycover:' will take a written book by the specified book title + author pair.
+    //
+    // Using 'xp' will take experience from the player.
     //
     // If an economy is registered, using 'money' instead of an item will take money from the player's economy balance.
     //
@@ -69,7 +71,7 @@ public class TakeCommand extends AbstractCommand {
     // - take emerald quantity:5
     // -->
 
-    private enum Type {MONEY, ITEMINHAND, ITEM, INVENTORY, BYDISPLAY, SLOT, BYCOVER, SCRIPTNAME, NBT}
+    private enum Type {MONEY, XP, ITEMINHAND, ITEM, INVENTORY, BYDISPLAY, SLOT, BYCOVER, SCRIPTNAME, NBT}
 
     @Override
     public void parseArgs(ScriptEntry scriptEntry) throws InvalidArgumentsException {
@@ -81,12 +83,16 @@ public class TakeCommand extends AbstractCommand {
                 scriptEntry.addObject("type", Type.MONEY);
             }
             else if (!scriptEntry.hasObject("type")
+                    && arg.matches("xp", "exp")) {
+                scriptEntry.addObject("type", Type.XP);
+            }
+            else if (!scriptEntry.hasObject("type")
                     && arg.matches("item_in_hand", "iteminhand")) {
                 scriptEntry.addObject("type", Type.ITEMINHAND);
             }
             else if (!scriptEntry.hasObject("qty")
                     && arg.matchesPrefix("q", "qty", "quantity")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Double)) {
+                    && arg.matchesFloat()) {
                 scriptEntry.addObject("qty", arg.asElement());
             }
             else if (!scriptEntry.hasObject("items")
@@ -137,7 +143,9 @@ public class TakeCommand extends AbstractCommand {
                     && arg.matches("npc")) {
                 scriptEntry.addObject("inventory", Utilities.getEntryNPC(scriptEntry).getDenizenEntity().getInventory());
             }
-
+            else {
+                arg.reportUnhandled();
+            }
         }
 
         scriptEntry.defaultObject("type", Type.ITEM)
@@ -232,6 +240,11 @@ public class TakeCommand extends AbstractCommand {
                 break;
             }
 
+            case XP: {
+                Utilities.getEntryPlayer(scriptEntry).getPlayerEntity().giveExp(-qty.asInt());
+                break;
+            }
+
             case ITEM: {
                 for (ItemTag item : items) {
                     ItemStack is = item.getItemStack();
@@ -318,11 +331,20 @@ public class TakeCommand extends AbstractCommand {
 
             case SLOT: {
                 int slotId = SlotHelper.nameToIndex(slot.asString());
-                if (slotId == -1) {
+                if (slotId == -1 || slotId >= inventory.getSize()) {
                     Debug.echoError(scriptEntry.getResidingQueue(), "The input '" + slot.asString() + "' is not a valid slot!");
                     return;
                 }
-                inventory.setSlots(slotId, new ItemStack(Material.AIR));
+                ItemStack original = inventory.getInventory().getItem(slotId);
+                if (original != null && original.getType() != Material.AIR) {
+                    if (original.getAmount() > qty.asInt()) {
+                        original.setAmount(original.getAmount() - qty.asInt());
+                        inventory.setSlots(slotId, original);
+                    }
+                    else {
+                        inventory.setSlots(slotId, new ItemStack(Material.AIR));
+                    }
+                }
                 break;
             }
 

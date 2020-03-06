@@ -63,22 +63,12 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
     // @description
     // A LocationTag represents a point in the world.
     //
-    // For format info, see <@link language l@>
-    //
-    // -->
-
-    // <--[language]
-    // @name l@
-    // @group Object Fetcher System
-    // @description
-    // l@ refers to the 'object identifier' of a LocationTag. The 'l@' is notation for Denizen's Object
-    // Fetcher. Note that 'l' is a lowercase 'L', the first letter in 'location'.
-    // The full constructor for a LocationTag is: 'l@<x>,<y>,<z>,<pitch>,<yaw>,<world>'
+    // These use the object notation "l@".
+    // Note that 'l' is a lowercase 'L', the first letter in 'location'.
+    // The identity format for locations is <x>,<y>,<z>,<pitch>,<yaw>,<world>
     // Note that you can leave off the world, and/or pitch and yaw, and/or the z value.
     // You cannot leave off both the z and the pitch+yaw at the same time.
     // For example, 'l@1,2.15,3,45,90,space' or 'l@7.5,99,3.2'
-    //
-    // For general info, see <@link language LocationTag Objects>
     //
     // -->
 
@@ -1672,6 +1662,30 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
         });
 
         // <--[tag]
+        // @attribute <LocationTag.rotate_yaw[<#.#>]>
+        // @returns LocationTag
+        // @description
+        // Returns the location with the yaw rotated the specified amount (eg 180 to face the location backwards).
+        // -->
+        registerTag("rotate_yaw", (attribute, object) -> {
+            LocationTag loc = LocationTag.valueOf(object.identify());
+            loc.setYaw(loc.getYaw() + (float) attribute.getDoubleContext(1));
+            return loc;
+        });
+
+        // <--[tag]
+        // @attribute <LocationTag.rotate_pitch[<#.#>]>
+        // @returns LocationTag
+        // @description
+        // Returns the location with the pitch rotated the specified amount. Note that this is capped to +/- 90.
+        // -->
+        registerTag("rotate_pitch", (attribute, object) -> {
+            LocationTag loc = LocationTag.valueOf(object.identify());
+            loc.setPitch(Math.max(-90, Math.min(90, loc.getPitch() + (float) attribute.getDoubleContext(1))));
+            return loc;
+        });
+
+        // <--[tag]
         // @attribute <LocationTag.face[<location>]>
         // @returns LocationTag
         // @description
@@ -1699,7 +1713,7 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
                 int degrees = 45;
                 LocationTag facingLoc;
                 if (LocationTag.matches(attribute.getContext(1))) {
-                    facingLoc = LocationTag.valueOf(attribute.getContext(1));
+                    facingLoc = object.clone();
                 }
                 else if (EntityTag.matches(attribute.getContext(1))) {
                     facingLoc = EntityTag.valueOf(attribute.getContext(1)).getLocation();
@@ -1771,7 +1785,7 @@ public class LocationTag extends org.bukkit.Location implements ObjectTag, Notab
                 pitch = Float.parseFloat(split[0]);
                 yaw = Float.parseFloat(split[1]);
             }
-            LocationTag loc = LocationTag.valueOf(object.identify());
+            LocationTag loc = object.clone();
             loc.setPitch(pitch);
             loc.setYaw(yaw);
             return loc;

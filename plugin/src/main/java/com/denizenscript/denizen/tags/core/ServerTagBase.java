@@ -197,17 +197,20 @@ public class ServerTagBase {
         // @description
         // Returns a list of all recipe IDs on the server.
         // Returns a list in the Namespace:Key format, for example "minecraft:gold_nugget".
-        // Optionally, specify a recipe type (CRAFTING, FURNACE, COOKING, BLASTING, SHAPED, SHAPELESS, SMOKING, STONECUTTING)
+        // Optionally, specify a recipe type (CRAFTING, FURNACE, COOKING, BLASTING, SHAPED, SHAPELESS, SMOKING, CAMPFIRE, STONECUTTING)
         // to limit to just recipes of that type.
+        // Note: this will produce an error if all recipes of any one type have been removed from the server, due to an error in Spigot.
         // -->
         if (attribute.startsWith("list_recipe_ids")) {
             String type = attribute.hasContext(1) ? CoreUtilities.toLowerCase(attribute.getContext(1)) : null;
             ListTag list = new ListTag();
-            Bukkit.recipeIterator().forEachRemaining((recipe) -> {
+            Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
+            while (recipeIterator.hasNext()) {
+                Recipe recipe = recipeIterator.next();
                 if (Utilities.isRecipeOfType(recipe, type) && recipe instanceof Keyed) {
                     list.add(((Keyed) recipe).getKey().toString());
                 }
-            });
+            }
             event.setReplacedObject(list.getObjectAttribute(attribute.fulfill(1)));
             return;
         }
@@ -867,7 +870,7 @@ public class ServerTagBase {
         // @description
         // Lists all saved Notables currently on the server.
         // Optionally, specify a type to search for.
-        // Valid types: locations, cuboids, ellipsoids, items, inventories
+        // Valid types: locations, cuboids, ellipsoids, inventories
         // -->
         if (attribute.startsWith("list_notables")) {
             ListTag allNotables = new ListTag();
@@ -1961,7 +1964,7 @@ public class ServerTagBase {
         else if (attribute.matches("list_plugins_handling_event")
                 && attribute.hasContext(1)) {
             String eventName = attribute.getContext(1);
-            if (eventName.contains(".")) {
+            if (CoreUtilities.contains(eventName, '.')) {
                 try {
                     Class clazz = Class.forName(eventName, false, ServerTagBase.class.getClassLoader());
                     ListTag result = getHandlerPluginList(clazz);

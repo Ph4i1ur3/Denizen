@@ -35,14 +35,14 @@ public abstract class BukkitScriptEvent extends ScriptEvent {
         if (MaterialTag.matches(text) || ItemTag.matches(text)) {
             return true;
         }
-        if (text.contains("*")) {
+        if (CoreUtilities.contains(text, '*')) {
             return true;
         }
         if (text.startsWith("regex:")) {
             return true;
         }
         // This one must be last.
-        if (text.contains("|")) {
+        if (CoreUtilities.contains(text, '|')) {
             for (String subMatch : text.split("\\|")) {
                 if (!couldMatchItem(subMatch)) {
                     return false;
@@ -143,20 +143,25 @@ public abstract class BukkitScriptEvent extends ScriptEvent {
         super.fire();
     }
 
+    @Override
+    public void cancellationChanged() {
+        if (currentEvent instanceof Cancellable) {
+            ((Cancellable) currentEvent).setCancelled(cancelled);
+        }
+        super.cancellationChanged();
+    }
+
+    public Event currentEvent = null;
+
     public void fire(Event event) {
+        currentEvent = event;
         if (event instanceof Cancellable) {
-            Cancellable cancellable = (Cancellable) event;
-            cancelled = cancellable.isCancelled();
-            boolean wasCancelled = cancelled;
-            fire();
-            if (cancelled != wasCancelled) {
-                cancellable.setCancelled(cancelled);
-            }
+            cancelled = ((Cancellable) event).isCancelled();
         }
         else {
             cancelled = false;
-            fire();
         }
+        fire();
     }
 
     @Override

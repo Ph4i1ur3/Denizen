@@ -141,6 +141,14 @@ public class CommandScriptEvent extends BukkitScriptEvent implements Listener {
         fire(event);
     }
 
+    @Override
+    public void cancellationChanged() {
+        if (cancelled && serverEvent != null) {
+            serverEvent.setCommand("denizen do_nothing");
+        }
+        super.cancellationChanged();
+    }
+
     @EventHandler
     public void onServerEvent(ServerCommandEvent event) {
         this.playerEvent = null;
@@ -160,8 +168,5 @@ public class CommandScriptEvent extends BukkitScriptEvent implements Listener {
             this.sourceType = "server";
         }
         fire(event);
-        if (cancelled) {
-            event.setCommand("denizen do_nothing");
-        }
     }
 }

@@ -9,7 +9,6 @@ import com.denizenscript.denizen.objects.NPCTag;
 import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.ArgumentHelper;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
 import org.bukkit.Material;
@@ -64,7 +63,7 @@ public class FishCommand extends AbstractCommand {
             }
             else if (!scriptEntry.hasObject("percent")
                     && arg.matchesPrefix("catchpercent", "percent", "chance", "c")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Integer)) {
+                    && arg.matchesInteger()) {
                 scriptEntry.addObject("percent", arg.asElement());
             }
 

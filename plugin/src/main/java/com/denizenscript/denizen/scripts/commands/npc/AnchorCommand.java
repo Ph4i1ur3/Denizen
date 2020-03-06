@@ -6,7 +6,6 @@ import com.denizenscript.denizen.objects.LocationTag;
 import com.denizenscript.denizen.objects.NPCTag;
 import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.ArgumentHelper;
 import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
@@ -64,7 +63,7 @@ public class AnchorCommand extends AbstractCommand {
                 scriptEntry.addObject("action", Action.valueOf(arg.getValue().toUpperCase()));
             }
             else if (!scriptEntry.hasObject("range")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Double)
+                    && arg.matchesFloat()
                     && arg.matchesPrefix("range", "r")) {
                 scriptEntry.addObject("range", arg.asElement());
             }

@@ -9,11 +9,9 @@ import com.denizenscript.denizen.objects.EntityTag;
 import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.ArgumentHelper;
 import com.denizenscript.denizencore.objects.core.ListTag;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
-import com.denizenscript.denizencore.tags.TagManager;
 import org.bukkit.entity.Entity;
 
 public class ChatCommand extends AbstractCommand {
@@ -87,7 +85,7 @@ public class ChatCommand extends AbstractCommand {
 
             }
             else if (arg.matchesPrefix("range", "r")) {
-                if (arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Double)) {
+                if (arg.matchesFloat()) {
                     scriptEntry.addObject("range", arg.asElement());
                 }
             }

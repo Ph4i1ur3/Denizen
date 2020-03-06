@@ -10,7 +10,6 @@ import com.denizenscript.denizen.objects.PlayerTag;
 import com.denizenscript.denizencore.exceptions.InvalidArgumentsException;
 import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.ArgumentHelper;
 import com.denizenscript.denizencore.objects.core.ListTag;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
@@ -125,27 +124,27 @@ public class AdvancementCommand extends AbstractCommand {
             }
             else if (!scriptEntry.hasObject("toast")
                     && arg.matchesPrefix("toast", "show")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Boolean)) {
+                    && arg.matchesBoolean()) {
                 scriptEntry.addObject("toast", arg.asElement());
             }
             else if (!scriptEntry.hasObject("announce")
                     && arg.matchesPrefix("announce", "chat")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Boolean)) {
+                    && arg.matchesBoolean()) {
                 scriptEntry.addObject("announce", arg.asElement());
             }
             else if (!scriptEntry.hasObject("hidden")
                     && arg.matchesPrefix("hidden", "hide", "h")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Boolean)) {
+                    && arg.matchesBoolean()) {
                 scriptEntry.addObject("hidden", arg.asElement());
             }
             else if (!scriptEntry.hasObject("x")
                     && arg.matchesPrefix("x")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Float)) {
+                    && arg.matchesFloat()) {
                 scriptEntry.addObject("x", arg.asElement());
             }
             else if (!scriptEntry.hasObject("y")
                     && arg.matchesPrefix("y")
-                    && arg.matchesPrimitive(ArgumentHelper.PrimitiveType.Float)) {
+                    && arg.matchesFloat()) {
                 scriptEntry.addObject("y", arg.asElement());
             }
             else {
